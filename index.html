@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Tâches - Hôtel</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      max-width: 1000px;
+    }
+    .card {
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+    .form-control:focus, .form-select:focus {
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      border-color: #86b7fe;
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #4b6cb7, #182848);
+      border: none;
+      padding: 10px 20px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(to right, #182848, #4b6cb7);
+      transform: translateY(-2px);
+    }
+    .table th {
+      background-color: #4b6cb7;
+      color: white;
+      font-weight: 600;
+    }
+    .table-hover tbody tr:hover {
+      background-color: rgba(75, 108, 183, 0.1);
+    }
+    .spinner-border {
+      width: 1.2rem;
+      height: 1.2rem;
+      display: none;
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    #taskTable {
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .header-title {
+      background: linear-gradient(to right, #4b6cb7, #182848);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <h2 class="mb-4 text-center header-title"><i class="fas fa-tasks me-2"></i>Gestion des Tâches Hôtelières</h2>
+
+        <!-- Formulaire -->
+        <form id="taskForm" class="card p-4 shadow mb-5">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Nom employé</label>
+              <input type="text" class="form-control" id="nom" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Service</label>
+              <select class="form-select" id="service" required>
+                <option value="" selected disabled>Sélectionnez un service</option>
+                <option value="Réception">Réception</option>
+                <option value="Ménage">Ménage</option>
+                <option value="Restauration">Restauration</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Sécurité">Sécurité</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Tâche</label>
+            <textarea class="form-control" id="tache" rows="2" required></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Date</label>
+            <input type="date" class="form-control" id="date" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100 mt-3">
+            <i class="fas fa-plus-circle me-2"></i>
+            <span id="submitText">Ajouter la tâche</span>
+            <div class="spinner-border spinner-border-sm text-light ms-2" role="status" id="spinner">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
+        </form>
+
+        <!-- Tableau -->
+        <div class="mt-5">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0"><i class="fas fa-list-check me-2"></i>Liste des Tâches</h4>
+            <button class="btn btn-outline-primary btn-sm" id="refreshBtn">
+              <i class="fas fa-refresh me-1"></i>Actualiser
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-hover" id="taskTable">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Service</th>
+                  <th>Tâche</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Les tâches ajoutées apparaissent ici -->
+                <tr id="noTasks">
+                  <td colspan="4" class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <p>Aucune tâche pour le moment</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast pour les notifications -->
+  <div class="toast align-items-center text-white bg-success border-0" role="alert" id="successToast">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i class="fas fa-check-circle me-2"></i>Tâche ajoutée avec succès !
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+
+  <div class="toast align-items-center text-white bg-danger border-0" role="alert" id="errorToast">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i class="fas fa-exclamation-circle me-2"></i>Erreur lors de l'ajout de la tâche !
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const form = document.getElementById("taskForm");
+    const tableBody = document.querySelector("#taskTable tbody");
+    const noTasksRow = document.getElementById("noTasks");
+    const spinner = document.getElementById("spinner");
+    const submitText = document.getElementById("submitText");
+    const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+    const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    // URL de votre script Apps Script
+    const scriptURL = "https://script.google.com/macros/s/AKfycbydwChNg8nyNXa4rOIaVUbK2aMuaVEN-yn7CfShcEktIWIbAoa5yMpJOJedgIKoS6Vbng/exec";
+
+    // Définir la date du jour comme valeur par défaut
+    document.getElementById('date').valueAsDate = new Date();
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      // Afficher le spinner et désactiver le bouton
+      spinner.style.display = "inline-block";
+      submitText.textContent = "Envoi en cours...";
+      form.querySelector('button[type="submit"]').disabled = true;
+
+      // Récupérer valeurs
+      const nom = document.getElementById("nom").value;
+      const service = document.getElementById("service").value;
+      const tache = document.getElementById("tache").value;
+      const date = document.getElementById("date").value;
+
+      // 1. Ajouter dans le tableau HTML
+      noTasksRow.style.display = "none";
+      const row = tableBody.insertRow();
+      row.innerHTML = `
+        <td>${nom}</td>
+        <td>${service}</td>
+        <td>${tache}</td>
+        <td>${new Date(date).toLocaleDateString('fr-FR')}</td>
+      `;
+
+      // 2. Envoyer vers Google Sheets
+      try {
+        const response = await fetch(scriptURL, {
+          method: "POST",
+          body: new URLSearchParams({
+            "Nom": nom,
+            "Service": service,
+            "Tâche": tache,
+            "Date": date
+          })
+        });
+
+        const result = await response.json();
+        console.log("Réponse Google Script :", result);
+
+        if (result.result === "success") {
+          successToast.show();
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        console.error("Erreur:", error);
+        errorToast.show();
+        
+        // Marquer la ligne en erreur
+        row.classList.add("table-danger");
+      } finally {
+        // Cacher le spinner et réactiver le bouton
+        spinner.style.display = "none";
+        submitText.textContent = "Ajouter la tâche";
+        form.querySelector('button[type="submit"]').disabled = false;
+      }
+
+      // Réinitialiser le formulaire (sauf la date)
+      document.getElementById("nom").value = "";
+      document.getElementById("service").value = "";
+      document.getElementById("tache").value = "";
+      document.getElementById("date").valueAsDate = new Date();
+    });
+
+    // Bouton d'actualisation
+    refreshBtn.addEventListener("click", function() {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>
