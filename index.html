@@ -3,224 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrice 4x4 avec Chronomètre</title>
+    <title>Matrice 4x4 - Cases normales</title>
     <style>
-        /* Styles CSS inchangés, sauf la suppression de ceux liés aux icônes */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            min-height: 100vh;
-            padding: 20px;
-            background-color: #f0f2f5;
-            color: #333;
-        }
+	/* Styles Généraux */
+	body {
+	    font-family: 'Poppins', sans-serif;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    flex-direction: column;
+	    min-height: 100vh;
+	    padding: 20px;
+	    background-color: #f8f9fa;
+	    color: #343a40;
+	}
 
-        h1 {
-            color: #1c3d5a;
-            margin-bottom: 30px;
-        }
+	h1 {
+	    color: #0d6efd;
+	    margin-bottom: 30px;
+	    font-weight: 700;
+	    text-align: center;
+	}
 
-        #matrix-container {
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 30px;
-        }
+	/* Conteneur de la Matrice */
+	#matrix-container {
+	    display: grid;
+	    grid-template-columns: repeat(4, 1fr);
+	    gap: 10px; /* Diminué légèrement le gap pour un aspect plus compact */
+	    width: 100%;
+	    max-width: 480px; /* Limite la largeur globale de la matrice pour des carrés plus petits */
+	}
 
-        .matrix-table {
-            border-collapse: separate;
-            border-spacing: 10px;
-        }
+	/* Cellules de la Matrice */
+	.cube-cell {
+	    width: 100%;
+	    aspect-ratio: 1 / 1; /* Maintient une forme carrée */
+	    max-width: 150px; /* Taille maximale des carrés sur les grands écrans */
+	    background-color: #ffffff;
+	    border: 1px solid #dee2e6;
+	    border-radius: 8px;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+	    transition: transform 0.3s ease, box-shadow 0.3s ease;
+	    margin: 0 auto; /* Centre les cellules dans leur colonne de grille */
+	}
 
-        .matrix-table td {
-            width: 125px;
-            height: 125px;
-            border: 2px solid #e8e8e8;
-            background-color: #f8f9fa;
-            border-radius: 12px;
-            padding: 5px;
-            text-align: center;
-            vertical-align: middle;
-            transition: all 0.3s ease;
-        }
+	.cube-cell:hover {
+	    transform: translateY(-5px);
+	    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+	}
 
-        .matrix-table td:hover {
-            border-color: #0d6efd;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.15);
-        }
+	.cube-cell select, .cube-cell button {
+	    width: 100%;
+	    height: 100%;
+	    border: none;
+	    background-color: transparent;
+	    font-size: 1.2em; /* Réduit la taille de la police */
+	    font-weight: 600;
+	    color: #495057;
+	    text-align: center;
+	    cursor: pointer;
+	    -webkit-appearance: none;
+	    -moz-appearance: none;
+	    appearance: none;
+	    outline: none;
+	}
 
-        .matrix-table select, .matrix-table input, .matrix-table button {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: transparent;
-            font-size: 2em;
-            font-weight: 600;
-            color: #34495e;
-            text-align: center;
-            cursor: pointer;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-        
-        .matrix-table select {
-             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2334495e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 14px;
-            padding-right: 20px;
-        }
+	.cube-cell select {
+	    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23495057%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+	    background-repeat: no-repeat;
+	    background-position: right 8px center; /* Ajusté la position de l'icône */
+	    background-size: 14px; /* Ajusté la taille de l'icône */
+	    padding-right: 20px; /* Ajusté le padding */
+	}
 
-        .matrix-table input, .matrix-table button {
-            font-weight: 400;
-        }
+	.empty-cell {
+	    background-color: #e9ecef;
+	    border-style: dashed;
+	}
 
-        .empty-cell {
-            background-color: #e9ecef;
-            border-style: dashed;
-        }
+	.empty-cell:hover {
+	    transform: none;
+	    box-shadow: none;
+	}
 
-        .empty-cell:hover {
-            transform: none;
-            border-color: #e8e8e8;
-            box-shadow: none;
-        }
+	/* Boutons Heure */
+	.time-button, .stop-button {
+	    font-weight: 700;
+	    font-size: 1em; /* Réduit la taille de la police */
+	    cursor: pointer;
+	    transition: background-color 0.3s ease;
+	}
 
-        .matrix-table .timer-display {
-            background-color: #f8f9fa;
-            color: #34495e;
-            pointer-events: none;
-            border: 2px solid #e8e8e8;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.5em;
-        }
-        
-        .matrix-table button#A3 {
-            background-color: #dc3545;
-            color: white;
-            font-weight: 600;
-            font-size: 1.5em;
-            display: none;
-        }
-        
-        .matrix-table button#A3:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-        
-        .button-container {
-            display: flex;
-            gap: 20px;
-        }
-        
-        #submit-btn {
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            background: linear-gradient(45deg, #0d6efd, #0d47a1);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-            transition: all 0.3s ease;
-        }
+	.time-button {
+	    background-color: #e8f0fe;
+	    color: #0d6efd;
+	}
 
-        #submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(13, 110, 253, 0.4);
-        }
+	.time-button:hover {
+	    background-color: #d1e3fd;
+	}
 
-        #reset-btn {
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            background: linear-gradient(45deg, #6c757d, #343a40);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
-            transition: all 0.3s ease;
-        }
+	.stop-button {
+	    background-color: #dc3545;
+	    color: white;
+	    display: none;
+	}
 
-        #reset-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(108, 117, 125, 0.4);
-        }
-        
-        #result-container {
-            margin-top: 40px;
-            width: 100%;
-            max-width: 700px;
-        }
-        
-        /* NOUVEAU: Styles pour le tableau de résultat de type feuille de calcul */
-        .result-sheet {
-            border-collapse: collapse;
-            border: 1px solid #ccc;
-            width: 100%;
-            max-width: 600px;
-        }
-        .result-sheet td, .result-sheet th {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-        }
-        .result-sheet thead tr {
-            background-color: #e8f0fe;
-        }
-        .result-sheet th {
-            font-weight: 600;
-        }
-        .result-sheet .row-header {
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
+	.stop-button:disabled {
+	    background-color: #6c757d;
+	    cursor: not-allowed;
+	    opacity: 0.65;
+	}
+
+	/* Conteneur des Boutons */
+	.button-container {
+	    display: flex;
+	    justify-content: center;
+	    gap: 20px;
+	    margin-top: 30px;
+	    flex-wrap: wrap;
+	    width: 100%;
+	    max-width: 700px; /* Limite la largeur pour correspondre à la matrice */
+	}
+
+	#submit-btn, #reset-btn {
+	    padding: 12px 30px; /* Réduit le padding */
+	    font-size: 16px; /* Réduit la taille de la police */
+	    font-weight: 600;
+	    cursor: pointer;
+	    border: none;
+	    border-radius: 50px;
+	    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+	    transition: all 0.3s ease;
+	}
+
+	#submit-btn {
+	    background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+	    color: white;
+	}
+
+	#submit-btn:hover {
+	    transform: translateY(-3px);
+	    box-shadow: 0 7px 20px rgba(13, 110, 253, 0.4);
+	}
+
+	#reset-btn {
+	    background: linear-gradient(45deg, #6c757d, #5a6268);
+	    color: white;
+	}
+
+	#reset-btn:hover {
+	    transform: translateY(-3px);
+	    box-shadow: 0 7px 20px rgba(108, 117, 125, 0.4);
+	}
+
+	/* Conteneur des Résultats */
+	#result-container {
+	    margin-top: 40px;
+	    width: 100%;
+	    max-width: 700px; /* Cohérent avec la matrice */
+	    overflow-x: auto;
+	}
+
+	.result-sheet {
+	    border-collapse: collapse;
+	    border: 1px solid #dee2e6;
+	    width: 100%;
+	    max-width: 650px; /* Ajusté pour le tableau */
+	    margin: auto;
+	    font-size: 0.85em; /* Réduit la taille de la police du tableau */
+	}
+
+	.result-sheet td, .result-sheet th {
+	    border: 1px solid #dee2e6;
+	    padding: 10px 6px; /* Réduit le padding du tableau */
+	    text-align: center;
+	}
+
+	.result-sheet thead tr {
+	    background-color: #eaf3ff;
+	    color: #0d6efd;
+	    font-weight: 700;
+	}
+
+	.result-sheet th {
+	    font-weight: 600;
+	}
+
+	.result-sheet tbody tr:nth-child(even) {
+	    background-color: #f6f8fb;
+	}
+
+	/* Media Queries pour la Responsivité */
+
+	@media (max-width: 768px) {
+	    /* Écrans de tablette et petits ordinateurs */
+	    h1 {
+	        font-size: 1.4em;
+	    }
+	    
+	    #matrix-container {
+	        grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur tablette */
+	        gap: 10px;
+	        max-width: 400px; /* Limite la largeur de la matrice sur tablette */
+	    }
+
+	    .cube-cell {
+	        max-width: 100%; /* Permet aux cellules de prendre la largeur disponible dans les colonnes */
+	        height: 100px; /* Hauteur fixe pour les cellules sur tablette */
+	    }
+
+	    .cube-cell select, .cube-cell button {
+	        font-size: 0.9em; /* Réduit la taille de la police */
+	    }
+
+	    .cube-cell select {
+	        background-position: right 5px center;
+	        background-size: 12px;
+	        padding-right: 15px;
+	    }
+
+	    .button-container {
+	        flex-direction: column;
+	        align-items: center;
+	        gap: 10px;
+	        max-width: 400px;
+	    }
+
+	    #submit-btn, #reset-btn {
+	        width: 100%;
+	        max-width: 250px; /* Limite la largeur des boutons */
+	        padding: 10px 15px;
+	        font-size: 15px;
+	    }
+
+	    .result-sheet {
+	        font-size: 0.8em;
+	    }
+	}
+
+	@media (max-width: 480px) {
+	    /* Écrans de téléphone */
+	    h1 {
+	        font-size: 1.2em;
+	    }
+	    
+	    #matrix-container {
+	        grid-template-columns: 1fr; /* Une seule colonne */
+	        gap: 8px;
+	        max-width: 250px; /* Limite la largeur de la matrice sur téléphone */
+	    }
+
+	    .cube-cell {
+	        height: 80px; /* Hauteur fixe plus petite pour les cellules sur téléphone */
+	    }
+
+	    .cube-cell select, .cube-cell button {
+	        font-size: 0.8em; /* Réduit encore la taille de la police */
+	    }
+
+	    .button-container {
+	        max-width: 250px;
+	    }
+
+	    #submit-btn, #reset-btn {
+	        max-width: 200px;
+	        font-size: 14px;
+	    }
+
+	    .result-sheet {
+	        font-size: 0.7em;
+	    }
+	    .result-sheet td, .result-sheet th {
+	        padding: 8px 4px; /* Encore moins de padding pour le tableau */
+	    }
+	}
     </style>
 </head>
 <body>
 
-    <h1>Matrice de configuration 4x4</h1>
-
+    <h1>GESTION des TACHES</h1>
+    
     <div id="matrix-container">
-        <table class="matrix-table">
-            <tbody>
-                <tr>
-                    <td><select id="A1"><option value="">--</option><option value="A">A</option><option value="T">T</option></select></td>
-                    <td><input type="text" id="A2" class="timer-display" value="00:00" readonly></td>
-                    <td><button id="A3" disabled>Arrêter</button></td>
-                    <td><select id="A4"><option value="">--</option><option value="01">01</option><option value="02">02</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="20">20</option><option value="21">21</option><option value="22">22</option></select></td>
-                </tr>
-                <tr>
-                    <td class="empty-cell"></td>
-                    <td class="empty-cell"></td>
-                    <td class="empty-cell"></td>
-                    <td><select id="B4"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
-                </tr>
-                <tr>
-                    <td class="empty-cell"></td>
-                    <td><select id="C2"><option value="">--</option><option value="R">R</option><option value="R_round">R_round</option><option value="2R">2R</option><option value="2R_round">2R_round</option><option value="3R">3R</option><option value="3R_round">3R_round</option></select></td>
-                    <td><select id="C3"><option value="">--</option><option value="X">X</option><option value="X_round">X_round</option></select></td>
-                    <td><select id="C4"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
-                </tr>
-                <tr>
-                    <td><select id="D1"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></td>
-                    <td class="empty-cell"></td>
-                    <td class="empty-cell"></td>
-                    <td><select id="D4"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="cube-cell"><select id="A1"><option value="">--</option><option value="A">A</option><option value="T">T</option></select></div>
+        <div class="cube-cell"><button id="start-time-btn" class="time-button"></button></div>
+        <div class="cube-cell"><button id="end-time-btn" class="stop-button"></button></div>
+        <div class="cube-cell"><select id="A4"><option value="">--</option><option value="01">01</option><option value="02">02</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="20">20</option><option value="21">21</option><option value="22">22</option></select></div>
+        <div class="cube-cell empty-cell"></div>
+        <div class="cube-cell empty-cell"></div>
+        <div class="cube-cell empty-cell"></div>
+        <div class="cube-cell"><select id="B4"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+        <div class="cube-cell empty-cell"></div>
+        <div class="cube-cell"><select id="C2"><option value="">--</option><option value="R">R</option><option value="R_round">R_round</option><option value="2R">2R</option><option value="2R_round">2R_round</option><option value="3R">3R</option><option value="3R_round">3R_round</option></select></div>
+        <div class="cube-cell"><select id="C3"><option value="">--</option><option value="X">X</option><option value="X_round">X_round</option></select></div>
+        <div class="cube-cell"><select id="C4"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+        <div class="cube-cell"><select id="D1"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select></div>
+        <div class="cube-cell empty-cell"></div>
+        <div class="cube-cell empty-cell"></div>
+        <div class="cube-cell"><select id="D4"><option value="">--</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
     </div>
 
     <div class="button-container">
@@ -232,192 +317,212 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const timeMapping = { 'A': 90, 'T': 375 }; 
-            
-            const selectA1 = document.getElementById('A1');
-            const selectD4 = document.getElementById('D4');
-            const timerDisplay = document.getElementById('A2');
-            const stopBtn = document.getElementById('A3');
-            const resultContainer = document.getElementById('result-container');
-            const resetBtn = document.getElementById('reset-btn');
-            
-            let timerId = null;
-            let startTime = null;
-            let elapsedTime = 0;
-            
-            const requiredFields = ['A1', 'A4', 'B4', 'C2', 'C3', 'C4', 'D1', 'D4'];
+	    const startTimeBtn = document.getElementById('start-time-btn');
+	    const endTimeBtn = document.getElementById('end-time-btn');
+	    const resultContainer = document.getElementById('result-container');
+	    const submitBtn = document.getElementById('submit-btn');
+	    const resetBtn = document.getElementById('reset-btn');
 
-            function areAllFieldsFilled() {
-                return requiredFields.every(fieldId => !!document.getElementById(fieldId).value);
-            }
+	    // Mappage des champs et de leur champ "débloquant"
+	    const fields = [
+	        { id: 'A1', next: ['A4', 'start-time-btn'] },
+	        { id: 'A4', next: 'B4' },
+	        { id: 'B4', next: 'C2' },
+	        { id: 'C2', next: 'C3' },
+	        { id: 'C3', next: 'C4' },
+	        { id: 'C4', next: 'D1' },
+	        { id: 'D1', next: 'D4' },
+	        { id: 'D4', next: ['end-time-btn', 'submit-btn'] }
+	    ];
 
-            function updateTimer() {
-                const now = Date.now();
-                elapsedTime = Math.floor((now - startTime) / 1000);
-                const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
-                const seconds = (elapsedTime % 60).toString().padStart(2, '0');
-                timerDisplay.value = `${minutes}:${seconds}`;
-            }
+	    let startTime = null;
+	    let endTime = null;
 
-            // Fonction pour afficher le tableau de résultat
-            function displayResultTable(data) {
-                const currentDate = new Date().toLocaleDateString('fr-FR');
-                resultContainer.innerHTML = `
-                    <h2>Résultats de la sélection</h2>
-                    <table class="result-sheet">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>N° Pavillon</th>
-                                <th>Date</th>
-                                <th>A1</th>
-                                <th>A2</th>
-                                <th>A3</th>
-                                <th>A4</th>
-                                <th>B1</th>
-                                <th>B2</th>
-                                <th>B3</th>
-                                <th>B4</th>
-                                <th>C1</th>
-                                <th>C2</th>
-                                <th>C3</th>
-                                <th>C4</th>
-                                <th>D1</th>
-                                <th>D2</th>
-                                <th>D3</th>
-                                <th>D4</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="row-header">1</td>
-                                <td>${data.D1 || 'N/A'}</td>
-                                <td>${currentDate}</td>
-                                <td>${data.A1 || 'N/A'}</td>
-                                <td>${data.A2 || 'N/A'}</td>
-                                <td>${data.A3 || 'N/A'}</td>
-                                <td>${data.A4 || 'N/A'}</td>
-                                <td>${data.B1 || 'N/A'}</td>
-                                <td>${data.B2 || 'N/A'}</td>
-                                <td>${data.B3 || 'N/A'}</td>
-                                <td>${data.B4 || 'N/A'}</td>
-                                <td>${data.C1 || 'N/A'}</td>
-                                <td>${data.C2 || 'N/A'}</td>
-                                <td>${data.C3 || 'N/A'}</td>
-                                <td>${data.C4 || 'N/A'}</td>
-                                <td>${data.D1 || 'N/A'}</td>
-                                <td>${data.D2 || 'N/A'}</td>
-                                <td>${data.D3 || 'N/A'}</td>
-                                <td>${data.D4 || 'N/A'}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                `;
-            }
+	    // Fonction pour désactiver toutes les cases sauf la première au démarrage
+	    function disableAllFields() {
+	        const allSelects = document.querySelectorAll('#matrix-container select');
+	        allSelects.forEach(select => {
+	            select.disabled = true;
+	        });
+	        document.getElementById('A1').disabled = false;
+	        startTimeBtn.disabled = true;
+	        endTimeBtn.style.display = 'none';
+	        submitBtn.disabled = true;
+	    }
 
-            // NOUVEAU: Vérifier et charger les données du localStorage au chargement de la page
-            const savedData = localStorage.getItem('matrixData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                // Pré-remplir les menus déroulants avec les données sauvegardées
-                document.getElementById('A1').value = data.A1 || '';
-                document.getElementById('A4').value = data.A4 || '';
-                document.getElementById('B4').value = data.B4 || '';
-                document.getElementById('C2').value = data.C2 || '';
-                document.getElementById('C3').value = data.C3 || '';
-                document.getElementById('C4').value = data.C4 || '';
-                document.getElementById('D1').value = data.D1 || '';
-                document.getElementById('D4').value = data.D4 || '';
+	    // Fonction pour activer les champs suivants
+	    function enableNextField(currentId) {
+	        const currentField = fields.find(f => f.id === currentId);
+	        if (currentField && currentField.next) {
+	            const nextElements = Array.isArray(currentField.next) ? currentField.next : [currentField.next];
+	            
+	            nextElements.forEach(nextId => {
+	                const nextElement = document.getElementById(nextId);
+	                if (nextElement) {
+	                    if (nextElement.tagName === 'SELECT' || nextElement.tagName === 'BUTTON') {
+	                        nextElement.disabled = false;
+	                    }
+	                    if (nextId === 'end-time-btn' || nextId === 'submit-btn') {
+	                        nextElement.style.display = 'block';
+	                    }
+	                }
+	            });
+	        }
+	    }
 
-                // A2 et A3 sont des valeurs générées, non des entrées utilisateur
-                timerDisplay.value = data.A2 || '00:00';
-                elapsedTime = data.elapsedTime || 0;
+	    // Initialisation : désactiver tous les champs au chargement
+	    disableAllFields();
 
-                // Afficher le tableau de résultat sauvegardé
-                displayResultTable(data);
-            }
+	    // Événements de changement pour l'enchaînement des cases
+	    fields.forEach(field => {
+	        const selectElement = document.getElementById(field.id);
+	        if (selectElement) {
+	            selectElement.addEventListener('change', function() {
+	                if (this.value !== "") {
+	                    enableNextField(this.id);
+	                } else {
+	                    // Logique pour désactiver les champs suivants si la valeur est réinitialisée
+	                    const currentIndex = fields.findIndex(f => f.id === this.id);
+	                    for (let i = currentIndex + 1; i < fields.length; i++) {
+	                        const nextId = fields[i].id;
+	                        const nextElement = document.getElementById(nextId);
+	                        if (nextElement) {
+	                            nextElement.disabled = true;
+	                            nextElement.value = '';
+	                        }
+	                    }
+	                    endTimeBtn.style.display = 'none';
+	                    submitBtn.disabled = true;
+	                }
+	            });
+	        }
+	    });
 
+	    // Événements pour les boutons de temps
+	    startTimeBtn.addEventListener('click', function() {
+	        if (startTime === null) {
+	            startTime = getFormattedTime();
+	            this.textContent = startTime;
+	            this.disabled = true;
+	            this.style.cursor = 'default';
+	        }
+	    });
 
-            selectA1.addEventListener('change', function() {
-                if (timerId) {
-                    clearInterval(timerId);
-                }
-                
-                const selectedValue = this.value;
-                if (selectedValue && timeMapping[selectedValue] !== undefined) {
-                    startTime = Date.now();
-                    updateTimer();
-                    timerId = setInterval(updateTimer, 1000);
-                } else {
-                    timerDisplay.value = '00:00';
-                }
-            });
+	    endTimeBtn.addEventListener('click', function() {
+	        if (endTime === null) {
+	            endTime = getFormattedTime();
+	            this.textContent = endTime;
+	            this.disabled = true;
+	            this.style.cursor = 'default';
+	        }
+	    });
 
-            selectD4.addEventListener('change', function() {
-                if (this.value !== "") {
-                    stopBtn.style.display = 'block';
-                    stopBtn.disabled = false;
-                } else {
-                    stopBtn.style.display = 'none';
-                    stopBtn.disabled = true;
-                }
-            });
+	    // Fonction de validation et d'affichage
+	    const requiredFields = fields.map(f => f.id);
+	    function areAllFieldsFilled() {
+	        const isFormFilled = requiredFields.every(fieldId => !!document.getElementById(fieldId).value);
+	        return isFormFilled && startTime && endTime;
+	    }
 
-            stopBtn.addEventListener('click', function() {
-                if (timerId) {
-                    clearInterval(timerId);
-                    timerId = null;
-                    stopBtn.disabled = true;
-                    stopBtn.style.display = 'none';
-                    timerDisplay.value = `Tâche terminée en ${timerDisplay.value}`;
-                }
-            });
+	    function getFormattedTime() {
+	        const now = new Date();
+	        const hours = now.getHours().toString().padStart(2, '0');
+	        const minutes = now.getMinutes().toString().padStart(2, '0');
+	        const seconds = now.getSeconds().toString().padStart(2, '0');
+	        return `${hours}:${minutes}:${seconds}`;
+	    }
 
-            document.getElementById('submit-btn').addEventListener('click', function() {
-                if (areAllFieldsFilled()) {
-                    const values = {
-                        A1: document.getElementById('A1').value,
-                        A2: timerDisplay.value,
-                        A3: `Tâche finie en ${Math.floor(elapsedTime / 60)} min ${elapsedTime % 60} sec`,
-                        A4: document.getElementById('A4').value,
-                        B4: document.getElementById('B4').value,
-                        C2: document.getElementById('C2').value,
-                        C3: document.getElementById('C3').value,
-                        C4: document.getElementById('C4').value,
-                        D1: document.getElementById('D1').value,
-                        D4: document.getElementById('D4').value,
-                        B1: '', B2: '', B3: '', C1: '', D2: '', D3: '',
-                        elapsedTime: elapsedTime // Sauvegarder aussi le temps écoulé
-                    };
-                    
-                    // NOUVEAU: Sauvegarder les données dans le localStorage
-                    localStorage.setItem('matrixData', JSON.stringify(values));
+	    submitBtn.addEventListener('click', function() {
+	        if (areAllFieldsFilled()) {
+	            const values = {
+	                date: new Date().toLocaleDateString('fr-FR'),
+	                A1: document.getElementById('A1').value,
+	                A2_start: startTime,
+	                A3_end: endTime,
+	                A4: document.getElementById('A4').value,
+	                B1: '', B2: '', B3: '',
+	                B4: document.getElementById('B4').value,
+	                C1: '',
+	                C2: document.getElementById('C2').value,
+	                C3: document.getElementById('C3').value,
+	                C4: document.getElementById('C4').value,
+	                D1: document.getElementById('D1').value,
+	                D2: '', D3: '',
+	                D4: document.getElementById('D4').value,
+	            };
 
-                    displayResultTable(values);
-                } else {
-                    alert('Veuillez remplir toutes les cases pour afficher le résultat.');
-                }
-            });
+	            resultContainer.innerHTML = `
+	                <h2>Résultats de la sélection</h2>
+	                <table class="result-sheet">
+	                    <thead>
+	                        <tr>
+	                            <th>N° Pavillon</th>
+	                            <th>Date</th>
+	                            <th>A1</th>
+	                            <th>A2</th>
+	                            <th>A3</th>
+	                            <th>A4</th>
+	                            <th>B1</th>
+	                            <th>B2</th>
+	                            <th>B3</th>
+	                            <th>B4</th>
+	                            <th>C1</th>
+	                            <th>C2</th>
+	                            <th>C3</th>
+	                            <th>C4</th>
+	                            <th>D1</th>
+	                            <th>D2</th>
+	                            <th>D3</th>
+	                            <th>D4</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        <tr>
+	                            <td>${values.D1 || 'N/A'}</td>
+	                            <td>${values.date}</td>
+	                            <td>${values.A1 || 'N/A'}</td>
+	                            <td>${values.A2_start || 'N/A'}</td>
+	                            <td>${values.A3_end || 'N/A'}</td>
+	                            <td>${values.A4 || 'N/A'}</td>
+	                            <td>${values.B1 || 'N/A'}</td>
+	                            <td>${values.B2 || 'N/A'}</td>
+	                            <td>${values.B3 || 'N/A'}</td>
+	                            <td>${values.B4 || 'N/A'}</td>
+	                            <td>${values.C1 || 'N/A'}</td>
+	                            <td>${values.C2 || 'N/A'}</td>
+	                            <td>${values.C3 || 'N/A'}</td>
+	                            <td>${values.C4 || 'N/A'}</td>
+	                            <td>${values.D1 || 'N/A'}</td>
+	                            <td>${values.D2 || 'N/A'}</td>
+	                            <td>${values.D3 || 'N/A'}</td>
+	                            <td>${values.D4 || 'N/A'}</td>
+	                        </tr>
+	                    </tbody>
+	                </table>
+	            `;
+	        } else {
+	            alert('Veuillez remplir toutes les cases et enregistrer les heures de début et de fin pour afficher le résultat.');
+	        }
+	    });
 
-            resetBtn.addEventListener('click', function() {
-                if (timerId) {
-                    clearInterval(timerId);
-                    timerId = null;
-                }
-                
-                document.querySelectorAll('.matrix-table select').forEach(select => {
-                    select.selectedIndex = 0;
-                });
-
-                timerDisplay.value = '00:00';
-                stopBtn.style.display = 'none';
-                elapsedTime = 0;
-                
-                resultContainer.innerHTML = '';
-                // NOUVEAU: Effacer les données du localStorage
-                localStorage.removeItem('matrixData');
-            });
-        });
+	    resetBtn.addEventListener('click', function() {
+	        document.querySelectorAll('select').forEach(select => {
+	            select.selectedIndex = 0;
+	        });
+	        startTime = null;
+	        endTime = null;
+	        startTimeBtn.textContent = 'Heure de début';
+	        startTimeBtn.disabled = true;
+	        startTimeBtn.style.cursor = 'default';
+	        endTimeBtn.textContent = 'Heure de fin';
+	        endTimeBtn.disabled = true;
+	        endTimeBtn.style.cursor = 'default';
+	        endTimeBtn.style.display = 'none';
+	        submitBtn.disabled = true;
+	        resultContainer.innerHTML = '';
+	        disableAllFields(); // Réinitialiser tous les champs à l'état initial
+	    });
+	});
     </script>
 </body>
 </html>
