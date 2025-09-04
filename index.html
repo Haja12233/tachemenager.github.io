@@ -3,782 +3,681 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrice 4x4 - Cases réorganisées</title>
+    <title>Matrice 4x4 Interactive Corrigée</title>
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-
-    /* Styles Généraux */
-    body {
-        font-family: 'Poppins', sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        min-height: 100vh;
-        padding: 20px;
-        background-color: #f8f9fa;
-        color: #343a40;
-        margin: 0;
-    }
-
-    h1 {
-        color: #0d6efd;
-        margin-bottom: 30px;
-        font-weight: 700;
-        text-align: center;
-    }
-
-    /* Conteneur de la Matrice */
-    #matrix-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        width: 100%;
-        max-width: 480px;
-    }
-
-    /* Cellules de la Matrice */
-    .cube-cell {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        max-width: 150px;
-        background-color: #ffffff;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        margin: 0 auto;
-        position: relative;
-    }
-
-    .cube-cell:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .cube-cell select, .cube-cell button {
-        width: 100%;
-        height: 100%;
-        border: none;
-        background-color: transparent;
-        font-size: 1.2em;
-        font-weight: 600;
-        color: #495057;
-        text-align: center;
-        cursor: pointer;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        outline: none;
-    }
-
-    .cube-cell select {
-        background-image: url('image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23495057%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-        background-repeat: no-repeat;
-        background-position: right 8px center;
-        background-size: 14px;
-        padding-right: 20px;
-    }
-
-    .empty-cell {
-        background-color: #e9ecef;
-        border-style: dashed;
-    }
-
-    .empty-cell:hover {
-        transform: none;
-        box-shadow: none;
-    }
-
-    /* Style pour les badges */
-    .badge {
-        --size: 1.8em;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: var(--size);
-        height: var(--size);
-        border: 2px solid currentColor;
-        border-radius: 50%;
-        font: 700 0.8em/1 system-ui, sans-serif;
-        letter-spacing: 0.02em;
-        margin-right: 8px;
-        vertical-align: middle;
-    }
-
-    /* Boutons Heure */
-    .time-button, .stop-button {
-        font-weight: 700;
-        font-size: 1em;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .time-button {
-        background-color: #e8f0fe;
-        color: #0d6efd;
-    }
-
-    .time-button:hover {
-        background-color: #d1e3fd;
-    }
-
-    .stop-button {
-        background-color: #dc3545;
-        color: white;
-        display: none;
-    }
-
-    .stop-button:disabled {
-        background-color: #6c757d;
-        cursor: not-allowed;
-        opacity: 0.65;
-    }
-
-    /* Notification stylée */
-    .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 20px 25px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #4BB543, #2E7D32);
-        color: white;
-        font-weight: 600;
-        font-size: 16px;
-        box-shadow: 0 10px 25px rgba(75, 181, 67, 0.3);
-        transform: translateX(150%);
-        transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        max-width: 350px;
-    }
-
-    .notification.show {
-        transform: translateX(0);
-    }
-
-    .notification-icon {
-        font-size: 24px;
-    }
-
-    .notification-close {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-        margin-left: 15px;
-        padding: 0;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: background-color 0.2s;
-    }
-
-    .notification-close:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Style pour les options désactivées */
-    .disabled-option {
-        background-color: #ffcdd2 !important;
-        color: #6c757d !important;
-    }
-
-    /* Media Queries pour la Responsivité */
-    @media (max-width: 768px) {
-        h1 {
-            font-size: 1.4em;
+        body {
+            font-family: sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            border-collapse: separate;
+            border-spacing: 10px;
+            margin: 50px auto;
+        }
+        td {
+            border: 2px solid #ccc;
+            padding: 25px;
+            text-align: center;
+            width: 140px;
+            height: 70px;
+            position: relative;
+            cursor: pointer;
+            background-color: white;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #333;
         }
         
-        #matrix-container {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            max-width: 400px;
-        }
-
-        .cube-cell {
-            max-width: 100%;
-            height: 100px;
-        }
-
-        .cube-cell select, .cube-cell button {
-            font-size: 0.9em;
-        }
-
-        .cube-cell select {
-            background-position: right 5px center;
-            background-size: 12px;
-            padding-right: 15px;
-        }
-
-        .notification {
-            max-width: 300px;
-            font-size: 14px;
-            padding: 15px 20px;
-            top: 15px;
-            right: 15px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        h1 {
-            font-size: 1.2em;
+        .transparent-cell {
+            background-color: transparent;
+            border: none;
+            cursor: default;
         }
         
-        #matrix-container {
-            grid-template-columns: 1fr;
-            gap: 8px;
-            max-width: 250px;
+        .inactive-cell {
+            background-color: #f0f0f0;
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .inactive-cell * {
+            pointer-events: none;
+        }
+        
+        .active-cell {
+            background-color: #e3f2fd;
+            border-color: #2196F3;
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
+        }
+        
+        .selected-cell {
+            background-color: #bbdefb;
+            border-color: #1976D2;
+        }
+        
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: none;
+            z-index: 10;
+            min-width: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .dropdown div {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .dropdown div:hover {
+            background: #f0f0f0;
         }
 
-        .cube-cell {
-            height: 80px;
-        }
-
-        .cube-cell select, .cube-cell button {
-            font-size: 0.8em;
-        }
-
-        .notification {
-            max-width: 280px;
-            font-size: 13px;
+        button {
             padding: 12px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            color: white;
+        }
+        .btn-debut { background-color: #28a745; }
+        .btn-debut:hover { background-color: #218838; }
+        .btn-fin { background-color: #dc3545; }
+        .btn-fin:hover { background-color: #c82333; }
+        
+        .checkbox-container { display: flex; gap: 10px; }
+        .checkbox-item { display: flex; align-items: center; gap: 5px; }
+        .checkbox-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .checkbox-item label { font-size: 12px; cursor: pointer; }
+        
+        .text-red { color: #d63031; font-weight: bold; }
+        .text-green { color: #00b894; font-weight: bold; }
+        
+        .cell-red { background-color: #ffcccc; }
+        .cell-green { background-color: #ccffcc; }
+        
+        .option-with-checkbox { display: flex; justify-content: space-between; width: 100%; align-items: center; }
+        .option-text { flex-grow: 1; text-align: left; }
+        
+        .instruction {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2196F3;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none;
+        }
+        
+        .timer-display {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none;
+        }
+        
+        .results-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border-top: 3px solid #2196F3;
+            padding: 20px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .results-table th, .results-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .results-table th {
+            background-color: #e3f2fd;
+            font-weight: bold;
+        }
+        
+        .close-results {
+            position: absolute;
             top: 10px;
             right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
         }
-    }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .results-title {
+            color: #2196F3;
+            margin: 0;
+        }
+        
+        .timestamp {
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
 
-    <h1>GESTION des TACHES</h1>
-    
-    <div id="matrix-container">
-        <!-- Ligne 1 -->
-        <div class="cube-cell"><select id="A1">
-            <option value="">Pavillon</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-        </select></div>
-        <div class="cube-cell"><select id="B1"></select></div>
-        <div class="cube-cell"><select id="C1"></select></div>
-        <div class="cube-cell"><select id="D1">
-            <option value="">Utilisateur</option>
-            <option value="Annivah">Annivah</option>
-            <option value="Tinah">Tinah</option>
-        </select></div>
-        
-        <!-- Ligne 2 -->
-        <div class="cube-cell"><button id="start-time-btn" class="time-button">Heure de début</button></div>
-        <div class="cube-cell"><select id="B2"></select></div>
-        <div class="cube-cell">
-            <select id="C2">
-                <option value="">C2</option>
-                <option value="R"><span class="badge">R</span> R</option>
-                <option value="R_round"><span class="badge">R</span> R_round</option>
-                <option value="2R"><span class="badge">2R</span> 2R</option>
-                <option value="2R_round"><span class="badge">2R</span> 2R_round</option>
-                <option value="3R"><span class="badge">3R</span> 3R</option>
-                <option value="3R_round"><span class="badge">3R</span> 3R_round</option>
-            </select>
-        </div>
-        <div class="cube-cell"><select id="D2"></select></div>
-        
-        <!-- Ligne 3 -->
-        <div class="cube-cell"><button id="end-time-btn" class="stop-button">Heure de fin</button></div>
-        <div class="cube-cell"><select id="B3"></select></div>
-        <div class="cube-cell">
-            <select id="C3">
-                <option value="">C3</option>
-                <option value="X"><span class="badge">X</span> X</option>
-                <option value="X_round"><span class="badge">X</span> X_round</option>
-            </select>
-        </div>
-        <div class="cube-cell"><select id="D3"></select></div>
-        
-        <!-- Ligne 4 -->
-        <div class="cube-cell"><select id="A4">
-            <option value="">A4</option>
-            <option value="01">01</option>
-            <option value="02">02</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="20">20</option>
-            <option value="21">21</option>
-            <option value="22">22</option>
-        </select></div>
-        <div class="cube-cell"><select id="B4">
-            <option value="">B4</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-        </select></div>
-        <div class="cube-cell"><select id="C4">
-            <option value="">C4</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-        </select></div>
-        <div class="cube-cell"><select id="D4">
-            <option value="">D4</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-        </select></div>
-    </div>
+    <div id="instruction" class="instruction"></div>
+    <div id="timer-display" class="timer-display"></div>
+    <div id="notification" class="notification">Tâche terminée avec succès ! ✅</div>
 
-    <!-- Notification stylée -->
-    <div id="notification" class="notification">
-        <span class="notification-icon">✓</span>
-        <span id="notification-text">La tâche a été envoyée avec succès !</span>
-        <button class="notification-close" onclick="closeNotification()">&times;</button>
+    <table>
+        <tr>
+            <td id="a1-cell" class="inactive-cell" onclick="handleCellClick(this)">
+                <span class="cell-value">Locale</span>
+                <div class="dropdown">
+                    <div onclick="chooseValue(this)">Locale</div>
+                    <div onclick="chooseValue(this)">P1</div><div onclick="chooseValue(this)">P2</div><div onclick="chooseValue(this)">P3</div><div onclick="chooseValue(this)">P4</div><div onclick="chooseValue(this)">P5</div><div onclick="chooseValue(this)">P6</div><div onclick="chooseValue(this)">P7</div><div onclick="chooseValue(this)">P8</div><div onclick="chooseValue(this)">P9</div><div onclick="chooseValue(this)">P10</div>
+                </div>
+            </td>
+            <td class="transparent-cell"></td>
+            <td class="transparent-cell"></td>
+            <td id="d1-cell" onclick="handleCellClick(this)">
+                <span class="cell-value">Choisir</span>
+                <div class="dropdown">
+                    <div onclick="chooseValue(this, 'A')">Anniva</div>
+                    <div onclick="chooseValue(this, 'T')">Tinah</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td id="a2-cell" class="inactive-cell">
+                <button class="btn-debut" onclick="startTask()">Début du tache</button>
+            </td>
+            <td class="transparent-cell"></td>
+            <td id="c2-cell" class="inactive-cell" onclick="handleCellClick(this)">
+                <span class="cell-value">C2</span>
+                <div class="dropdown">
+                    <div><div class="option-with-checkbox"><span class="option-text" id="chambre-text">Chambre</span><div class="checkbox-container"><div class="checkbox-item"><input type="checkbox" id="chambre-vert" onchange="updateTextColor('chambre', 'green')"><label for="chambre-vert">V</label></div><div class="checkbox-item"><input type="checkbox" id="chambre-rouge" onchange="updateTextColor('chambre', 'red')"><label for="chambre-rouge">R</label></div></div></div></div>
+                    <div><div class="option-with-checkbox"><span class="option-text" id="cuisine-text">Cuisine</span><div class="checkbox-container"><div class="checkbox-item"><input type="checkbox" id="cuisine-vert" onchange="updateTextColor('cuisine', 'green')"><label for="cuisine-vert">V</label></div><div class="checkbox-item"><input type="checkbox" id="cuisine-rouge" onchange="updateTextColor('cuisine', 'red')"><label for="cuisine-rouge">R</label></div></div></div></div>
+                    <div><div class="option-with-checkbox"><span class="option-text" id="terrasse-text">Terrasse</span><div class="checkbox-container"><div class="checkbox-item"><input type="checkbox" id="terrasse-vert" onchange="updateTextColor('terrasse', 'green')"><label for="terrasse-vert">V</label></div><div class="checkbox-item"><input type="checkbox" id="terrasse-rouge" onchange="updateTextColor('terrasse', 'red')"><label for="terrasse-rouge">R</label></div></div></div></div>
+                    <div><div class="option-with-checkbox"><span class="option-text" id="autre-text">Autre</span><div class="checkbox-container"><div class="checkbox-item"><input type="checkbox" id="autre-vert" onchange="updateTextColor('autre', 'green')"><label for="autre-vert">V</label></div><div class="checkbox-item"><input type="checkbox" id="autre-rouge" onchange="updateTextColor('autre', 'red')"><label for="autre-rouge">R</label></div></div></div></div>
+                </div>
+            </td>
+            <td class="transparent-cell"></td>
+        </tr>
+        <tr>
+            <td id="a3-cell" class="inactive-cell">
+                <button class="btn-fin" onclick="endTask()">Fin du tache</button>
+            </td>
+            <td class="transparent-cell"></td>
+            <td id="c3-cell" class="inactive-cell" onclick="handleCellClick(this)">
+                <span class="cell-value">C3</span>
+                <div class="dropdown">
+                    <div><div class="option-with-checkbox"><span class="option-text" id="personne-text">Personne a controlé</span><div class="checkbox-container"><div class="checkbox-item"><input type="checkbox" id="personne-checkbox" onchange="updateC3TextColor('personne')"></div></div></div></div>
+                    <div><div class="option-with-checkbox"><span class="option-text" id="xylophase-text">Xylophase</span><div class="checkbox-container"><div class="checkbox-item"><input type="checkbox" id="xylophase-checkbox" onchange="updateC3TextColor('xylophase')"></div></div></div></div>
+                </div>
+            </td>
+            <td class="transparent-cell"></td>
+        </tr>
+        <tr>
+            <td id="a4-cell" class="inactive-cell" onclick="handleCellClick(this)"><span class="cell-value">A4</span><div class="dropdown"><div onclick="chooseValue(this)">Vide</div><div onclick="chooseValue(this)">1</div><div onclick="chooseValue(this)">2</div><div onclick="chooseValue(this)">3</div></div></td>
+            <td id="b4-cell" class="inactive-cell" onclick="handleCellClick(this)"><span class="cell-value">B4</span><div class="dropdown"><div onclick="chooseValue(this)">Vide</div><div onclick="chooseValue(this)">1</div><div onclick="chooseValue(this)">2</div><div onclick="chooseValue(this)">3</div></div></td>
+            <td id="c4-cell" class="inactive-cell" onclick="handleCellClick(this)"><span class="cell-value">C4</span><div class="dropdown"><div onclick="chooseValue(this)">Vide</div><div onclick="chooseValue(this)">1</div><div onclick="chooseValue(this)">2</div><div onclick="chooseValue(this)">3</div></div></td>
+            <td id="d4-cell" class="inactive-cell" onclick="handleCellClick(this)"><span class="cell-value">D4</span><div class="dropdown"><div onclick="chooseValue(this)">Vide</div><div onclick="chooseValue(this)">1</div><div onclick="chooseValue(this)">2</div><div onclick="chooseValue(this)">3</div></div></td>
+        </tr>
+    </table>
+
+    <div id="results-container" class="results-container">
+        <div class="results-header">
+            <h3 class="results-title">Résultats de la Tâche</h3>
+            <button class="close-results" onclick="closeResults()">×</button>
+        </div>
+        <table class="results-table" id="results-table">
+            <thead id="results-header-row">
+                </thead>
+            <tbody id="results-body">
+                </tbody>
+        </table>
+        <div class="timestamp" id="results-timestamp"></div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const startTimeBtn = document.getElementById('start-time-btn');
-            const endTimeBtn = document.getElementById('end-time-btn');
-            const notification = document.getElementById('notification');
-            const d1Select = document.getElementById('D1');
-            const d4Select = document.getElementById('D4');
-            const a1Select = document.getElementById('A1');
+        // --- VARIABLES D'ÉTAT ---
+        let workflowState = 0; // 0:D1, 1:A2, 2:A1, 3:C2, 4:C3, 5:A4/B4/C4/D4, 6:A3
+        let timer;
+        let timeLeft = 7;
+        const workflowCells = ['a4-cell', 'b4-cell', 'c4-cell', 'd4-cell'];
+        let currentCellIndex = 0;
+        let c2CompletedOptions = new Set();
+        const c2TotalOptions = 4;
+        let taskStartTime = null;
+        let taskEndTime = null;
+        let taskStartDisplayTime = null;
+        let taskEndDisplayTime = null;
         
-            const fields = [
-              { id: 'A1', next: ['start-time-btn'] },
-              { id: 'start-time-btn', next: 'A4' },
-              { id: 'A4', next: 'B4' },
-              { id: 'B4', next: 'C2' },
-              { id: 'C2', next: 'C3' },
-              { id: 'C3', next: 'C4' },
-              { id: 'C4', next: 'D1' },
-              { id: 'D1', next: 'D4' },
-              { id: 'D4', next: ['end-time-btn'] }
-            ];
-        
-            let startTime = null;
-            let endTime = null;
-            let lockedA1Values = [];
-            let defaultD1Value = null;
-            let notificationTimeout = null;
-        
-            // Désactive tous les champs (sauf A1)
-            function disableAllFields() {
-              const allSelects = document.querySelectorAll('#matrix-container select');
-              allSelects.forEach(select => select.disabled = true);
-              document.getElementById('A1').disabled = false;
-              startTimeBtn.disabled = true;
-              endTimeBtn.style.display = 'none';
+        // --- INITIALISATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            activateNextStep(true);
+        });
+
+        // --- GESTIONNAIRES D'ÉVÉNEMENTS ---
+        function handleCellClick(cell) {
+            if (cell.classList.contains('inactive-cell')) return;
+            toggleDropdown(cell);
+        }
+
+        function startTask() {
+            showNotification('Début du tache lancé ! 🚀');
+            taskStartTime = new Date();
+            taskStartDisplayTime = taskStartTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            if (workflowState === 1) {
+                activateNextStep();
             }
-        
-            // Verrouille les options déjà utilisées dans A1
-            function applyALocks() {
-              if (a1Select) {
-                Array.from(a1Select.options).forEach(option => {
-                  if (lockedA1Values.includes(option.value) && option.value !== '') {
-                    option.disabled = true;
-                    option.classList.add('disabled-option');
-                  }
-                });
-              }
-            }
-        
-            // Charge les valeurs verrouillées depuis le storage
-            function loadLocks() {
-              try {
-                const a1Locks = localStorage.getItem('lockedA1Values');
-                const d1Default = localStorage.getItem('defaultD1Value');
-                const lockTimestamp = localStorage.getItem('lockTimestamp');
-        
-                if (a1Locks && lockTimestamp) {
-                  const timestamp = parseInt(lockTimestamp);
-                  const now = Date.now();
-        
-                  // Vérifier si le verrouillage est encore valide (24h)
-                  if (now - timestamp < (24 * 60 * 60 * 1000)) {
-                    lockedA1Values = JSON.parse(a1Locks);
-                    defaultD1Value = d1Default;
-                  } else {
-                    // Le verrouillage a expiré, nettoyer le localStorage
-                    clearLocks();
-                  }
-                }
-              } catch (error) {
-                console.log('Erreur lors du chargement des verrouillages:', error);
-              }
-            }
-        
-            // Sauvegarde les valeurs verrouillées
-            function saveLocks(a1Value, defaultD1Val) {
-              try {
-                lockedA1Values.push(a1Value);
-                defaultD1Value = defaultD1Val;
-        
-                localStorage.setItem('lockedA1Values', JSON.stringify(lockedA1Values));
-                localStorage.setItem('defaultD1Value', defaultD1Val);
-                localStorage.setItem('lockTimestamp', Date.now().toString());
-              } catch (error) {
-                console.log('Erreur lors de la sauvegarde des verrouillages:', error);
-              }
-            }
-        
-            // Efface les verrouillages
-            function clearLocks() {
-              try {
-                localStorage.removeItem('lockedA1Values');
-                localStorage.removeItem('defaultD1Value');
-                localStorage.removeItem('lockTimestamp');
-                lockedA1Values = [];
-                defaultD1Value = null;
-              } catch (error) {
-                console.log('Erreur lors de l\'effacement des verrouillages:', error);
-              }
-            }
-        
-            // Active le prochain champ
-            function enableNextField(currentId) {
-              const currentField = fields.find(f => f.id === currentId);
-              if (!currentField || !currentField.next) return;
-        
-              let nextElements = Array.isArray(currentField.next) ? currentField.next : [currentField.next];
-        
-              nextElements.forEach(nextId => {
-                const nextElement = document.getElementById(nextId);
-                if (nextElement) {
-                  // Si c'est D1 et qu'il y a une valeur par défaut, ignorer D1 et aller directement à D4
-                  if (nextId === 'D1' && defaultD1Value) {
-                    // Activer D4 directement
-                    document.getElementById('D4').disabled = false;
-                    document.getElementById('D4').focus();
-                    return;
-                  }
-                  // Si c'est D1 normal (pas de valeur par défaut)
-                  if (nextId === 'D1' && !defaultD1Value) {
-                    nextElement.disabled = false;
-                    return;
-                  }
-                  nextElement.disabled = false;
-                  if (nextId === 'end-time-btn') {
-                    nextElement.style.display = 'block';
-                  }
-                }
-              });
-            }
-        
-            // Badge pour C2/C3
-            function renderBadge(selectId) {
-              const select = document.getElementById(selectId);
-              select.addEventListener("change", function () {
-                let val = this.value;
-                if (val.endsWith("_round")) {
-                  let badge = document.createElement("span");
-                  badge.className = "badge";
-                  badge.textContent = val.replace("_round", "");
-                  this.style.display = "none";
-                  this.insertAdjacentElement("afterend", badge);
-                } else {
-                  let next = this.nextElementSibling;
-                  if (next && next.classList.contains("badge")) next.remove();
-                  this.style.display = "block";
-                }
-              });
-            }
-        
-            // Fonction pour envoyer les données à Google Sheets (simulation)
-            async function sendDataToGoogleSheets(values) {
-                try {
-                    // Pour les tests, simuler un succès
-                    // Remplacez cette URL par votre webhook Google Apps Script en production
-                    const webhookUrl = 'https://script.google.com/macros/s/AKfycbwAJu0wSAVrVyZv-CHMiXhdjJA-VTLDRVjqmnzHyUKjMBk8EeGDIo_a3xvWQa32rI428w/exec';
-                    
-                    // Simulation pour les tests (toujours retourne succès)
-                    console.log('Données simulées envoyées:', values);
-                    return true;
-                    
-                    /*
-                    // Code réel à décommenter en production :
-                    const response = await fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(values)
-                    });
-                    
-                    if (response.ok) {
-                        console.log('Données envoyées avec succès à Google Sheets');
-                        return true;
-                    } else {
-                        console.error('Erreur lors de l\'envoi des données:', response.status);
-                        return false;
-                    }
-                    */
-                } catch (error) {
-                    console.error('Erreur réseau:', error);
-                    // Pour les tests, retourner true même en cas d'erreur
-                    return true;
-                }
-            }
-        
-            // Afficher la notification
-            function showNotification(message, isSuccess = true) {
-                const notificationText = document.getElementById('notification-text');
-                const notificationIcon = document.querySelector('.notification-icon');
-                
-                notificationText.textContent = message;
-                
-                if (isSuccess) {
-                    notification.style.background = 'linear-gradient(135deg, #4BB543, #2E7D32)';
-                    notificationIcon.textContent = '✓';
-                    notificationIcon.style.color = '#4BB543';
-                } else {
-                    notification.style.background = 'linear-gradient(135deg, #FF6B6B, #C44545)';
-                    notificationIcon.textContent = '✗';
-                    notificationIcon.style.color = '#FF6B6B';
-                }
-                
-                notification.classList.add('show');
-                
-                // Cacher automatiquement après 3 secondes et réinitialiser
-                clearTimeout(notificationTimeout);
-                notificationTimeout = setTimeout(() => {
-                    closeNotification();
-                    resetForm();
-                }, 3000);
-            }
-        
-            // Fermer la notification
-            function closeNotification() {
-                notification.classList.remove('show');
-                clearTimeout(notificationTimeout);
-            }
-        
-            // Réinitialiser le formulaire
-            function resetForm() {
-                // Réinitialiser tous les champs
-                const allSelects = document.querySelectorAll('#matrix-container select');
-                allSelects.forEach(select => {
-                    select.value = '';
-                    select.disabled = true;
-                    select.classList.remove('disabled-option');
-                });
-                
-                // Supprimer les éléments de texte affichés
-                const textDisplays = document.querySelectorAll('#d1-display');
-                textDisplays.forEach(display => display.remove());
-                
-                // Réinitialiser les boutons
-                startTimeBtn.textContent = 'Heure de début';
-                startTimeBtn.disabled = true;
-                startTime = null;
-                
-                endTimeBtn.textContent = 'Heure de fin';
-                endTimeBtn.style.display = 'none';
-                endTimeBtn.disabled = true;
-                endTime = null;
-                
-                // Réactiver A1
-                document.getElementById('A1').disabled = false;
-                
-                // Réactiver tous les champs selon la logique initiale
-                disableAllFields();
-                applyALocks(); // Réappliquer les verrous sur A1
-                
-                // Si D1 a une valeur par défaut, l'afficher
-                if (defaultD1Value) {
-                    setupDefaultD1();
-                }
-            }
-        
-            // Configurer la valeur par défaut de D1
-            function setupDefaultD1() {
-                if (defaultD1Value) {
-                    // Masquer le select et afficher la valeur comme texte
-                    d1Select.style.display = 'none';
-                    
-                    // Créer un élément texte pour afficher la valeur
-                    const textDisplay = document.createElement('div');
-                    textDisplay.id = 'd1-display';
-                    textDisplay.style.fontSize = '1.2em';
-                    textDisplay.style.fontWeight = '600';
-                    textDisplay.style.color = '#495057';
-                    textDisplay.textContent = defaultD1Value;
-                    textDisplay.style.textAlign = 'center';
-                    d1Select.parentElement.appendChild(textDisplay);
-                }
-            }
-        
-            // Initialisation
-            loadLocks();
-            disableAllFields();
-            applyALocks(); // Appliquer les verrous sur A1
-            renderBadge("C2");
-            renderBadge("C3");
+        }
+
+        function endTask() {
+            taskEndTime = new Date();
+            taskEndDisplayTime = taskEndTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            showNotification('Tâche terminée avec succès ! ✅');
+            displayResults();
             
-            // Si D1 a une valeur par défaut, l'afficher
-            if (defaultD1Value) {
-                setupDefaultD1();
-            }
+            // Réinitialisation complète
+            workflowState = 0;
+            currentCellIndex = 0;
+            c2CompletedOptions.clear();
+            timeLeft = 7;
+            clearInterval(timer);
+            document.getElementById('timer-display').style.display = 'none';
+            
+            // Réinitialiser le texte des cellules
+            document.querySelector('#d1-cell .cell-value').textContent = 'Choisir';
+            document.querySelector('#a1-cell .cell-value').textContent = 'Locale';
+            document.querySelector('#c2-cell .cell-value').textContent = 'C2';
+            document.querySelector('#c3-cell .cell-value').textContent = 'C3';
+            document.querySelector('#a4-cell .cell-value').textContent = 'A4';
+            document.querySelector('#b4-cell .cell-value').textContent = 'B4';
+            document.querySelector('#c4-cell .cell-value').textContent = 'C4';
+            document.querySelector('#d4-cell .cell-value').textContent = 'D4';
+
+            // Réinitialiser les couleurs et les cases à cocher
+            resetC2();
+            resetC3();
+            
+            activateNextStep(true);
+        }
         
-            // Activation des champs selon la logique
-            fields.forEach(field => {
-              const selectElement = document.getElementById(field.id);
-              if (selectElement && selectElement.tagName === 'SELECT') {
-                selectElement.addEventListener('change', function() {
-                  if (this.value !== "") {
-                    enableNextField(this.id);
-                    
-                    // Si c'est D4 qui change de valeur, afficher automatiquement l'heure de fin
-                    if (field.id === 'D4' && this.value !== "") {
-                      // Afficher le bouton de fin
-                      endTimeBtn.style.display = 'block';
-                      endTimeBtn.disabled = false;
-                      
-                      // Déclencher automatiquement l'heure de fin
-                      if (!endTime) {
-                        setTimeout(async () => {
-                          endTime = getFormattedTime();
-                          endTimeBtn.textContent = endTime;
-                          endTimeBtn.disabled = true;
-                          endTimeBtn.style.cursor = 'default';
-                          
-                          // Envoyer automatiquement les données
-                          await submitData();
-                        }, 100);
-                      }
-                    }
-                  }
-                });
-              }
+        // --- FONCTION D'AFFICHAGE DES RÉSULTATS ---
+        function displayResults() {
+            const resultsHeader = document.getElementById('results-header-row');
+            const resultsBody = document.getElementById('results-body');
+            resultsHeader.innerHTML = '';
+            resultsBody.innerHTML = '';
+
+            // Construire l'en-tête du tableau
+            const headers = {
+                'a1-cell': 'N° Locale',
+                'a2-cell': 'Début du Tache',
+                'a3-cell': 'Fin du Tache',
+                'd1-cell': 'Utilisateur',
+                'c2-cell': 'C2',
+                'c3-cell': 'C3',
+                'a4-cell': 'A4',
+                'b4-cell': 'B4',
+                'c4-cell': 'C4',
+                'd4-cell': 'D4'
+            };
+            
+            const orderedCells = ['a1-cell', 'a2-cell', 'a3-cell', 'd1-cell', 'c2-cell', 'c3-cell', 'a4-cell', 'b4-cell', 'c4-cell', 'd4-cell'];
+            
+            let headerRow = '<tr>';
+            orderedCells.forEach(cellId => {
+                headerRow += `<th>${headers[cellId] || cellId.replace('-cell','').toUpperCase()}</th>`;
             });
-        
-            // Gestion du changement de valeur dans A1
-            a1Select.addEventListener('change', function() {
-              if (this.value !== "") {
-                // Sauvegarder la valeur sélectionnée pour 24h
-                lockedA1Values.push(this.value);
-                localStorage.setItem('lockedA1Values', JSON.stringify(lockedA1Values));
-                localStorage.setItem('lockTimestamp', Date.now().toString());
+            headerRow += '</tr>';
+            resultsHeader.innerHTML = headerRow;
+
+            // Construire le corps du tableau
+            let bodyRow = '<tr>';
+            orderedCells.forEach(cellId => {
+                let cellValue = 'Vide';
+                const cell = document.getElementById(cellId);
                 
-                // Appliquer les verrous
-                applyALocks();
-              }
-            });
-        
-            // Gestion du changement de valeur dans D1
-            d1Select.addEventListener('change', function() {
-              if (this.value !== "") {
-                // Si une valeur est sélectionnée dans D1, la considérer comme valeur par défaut permanente
-                defaultD1Value = this.value;
-                
-                // Sauvegarder la valeur par défaut
-                localStorage.setItem('defaultD1Value', defaultD1Value);
-                localStorage.setItem('lockTimestamp', Date.now().toString());
-                
-                // Masquer le select et afficher la valeur comme texte
-                this.style.display = 'none';
-                
-                // Créer un élément texte pour afficher la valeur
-                const textDisplay = document.createElement('div');
-                textDisplay.id = 'd1-display';
-                textDisplay.style.fontSize = '1.2em';
-                textDisplay.style.fontWeight = '600';
-                textDisplay.style.color = '#495057';
-                textDisplay.textContent = this.value;
-                textDisplay.style.textAlign = 'center';
-                this.parentElement.appendChild(textDisplay);
-                
-                // Activer D4 automatiquement et mettre le focus
-                setTimeout(() => {
-                  d4Select.disabled = false;
-                  d4Select.focus();
-                }, 100);
-              }
-            });
-        
-            startTimeBtn.addEventListener('click', function() {
-              if (!startTime) {
-                startTime = getFormattedTime();
-                this.textContent = startTime;
-                this.disabled = true;
-                this.style.cursor = 'default';
-                enableNextField('start-time-btn');
-              }
-            });
-        
-            endTimeBtn.addEventListener('click', function() {
-              if (!endTime) {
-                endTime = getFormattedTime();
-                this.textContent = endTime;
-                this.disabled = true;
-                this.style.cursor = 'default';
-              }
-            });
-        
-            function getFormattedTime() {
-              const now = new Date();
-              return `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
-            }
-        
-            // Fonction pour soumettre les données
-            async function submitData() {
-              const values = {
-                A1: document.getElementById('A1').value,
-                date: new Date().toLocaleDateString('fr-FR'),
-                A2: startTime,
-                A3: endTime,
-                A4: document.getElementById('A4').value,
-                B1: document.getElementById('B1').value,
-                B2: document.getElementById('B2').value,
-                B3: document.getElementById('B3').value,
-                B4: document.getElementById('B4').value,
-                C1: document.getElementById('C1').value,
-                C2: document.getElementById('C2').value,
-                C3: document.getElementById('C3').value,
-                C4: document.getElementById('C4').value,
-                D1: document.getElementById('D1').value || defaultD1Value,
-                D2: document.getElementById('D2').value,
-                D3: document.getElementById('D3').value,
-                D4: document.getElementById('D4').value,
-              };
-        
-              // Envoyer les données à Google Sheets
-              const sentSuccessfully = await sendDataToGoogleSheets(values);
-              
-              if (sentSuccessfully) {
-                console.log('Données envoyées avec succès:', values);
-                
-                // Sauvegarder les verrouillages
-                if (values.A1) {
-                    saveLocks(values.A1, values.D1);
+                if (cellId === 'a2-cell') {
+                    cellValue = taskStartDisplayTime || 'N/A';
+                } else if (cellId === 'a3-cell') {
+                    cellValue = taskEndDisplayTime || 'N/A';
+                } else if (cellId === 'c2-cell') {
+                    const c2Options = ['chambre', 'cuisine', 'terrasse', 'autre'];
+                    const c2Values = [];
+                    c2Options.forEach(option => {
+                        const vertChecked = document.getElementById(`${option}-vert`).checked;
+                        const rougeChecked = document.getElementById(`${option}-rouge`).checked;
+                        if (vertChecked) c2Values.push(`${option}: Vert`);
+                        else if (rougeChecked) c2Values.push(`${option}: Rouge`);
+                    });
+                    cellValue = c2Values.length > 0 ? c2Values.join(', ') : 'Vide';
+                } else if (cellId === 'c3-cell') {
+                    const personneChecked = document.getElementById('personne-checkbox').checked;
+                    const xylophaseChecked = document.getElementById('xylophase-checkbox').checked;
+                    if (personneChecked) cellValue = 'Personne à contrôler';
+                    else if (xylophaseChecked) cellValue = 'Xylophase';
+                } else if (cell && cell.querySelector('.cell-value')) {
+                     const value = cell.querySelector('.cell-value').textContent;
+                     if (value !== 'Choisir' && value !== 'Locale' && value !== 'A4' && value !== 'B4' && value !== 'C4' && value !== 'D4' && value !== 'C2' && value !== 'C3' && value.trim() !== '') {
+                        cellValue = value;
+                     }
                 }
-                applyALocks();
+                bodyRow += `<td>${cellValue}</td>`;
+            });
+            bodyRow += '</tr>';
+            resultsBody.innerHTML = bodyRow;
+            
+            // Mettre à jour l'horodatage
+            const timestampElement = document.getElementById('results-timestamp');
+            if (taskStartTime && taskEndTime) {
+                const duration = Math.round((taskEndTime - taskStartTime) / 1000);
+                timestampElement.textContent = `Tâche terminée le ${taskEndTime.toLocaleDateString()} à ${taskEndTime.toLocaleTimeString()} | Durée: ${duration} secondes`;
+            } else {
+                timestampElement.textContent = `Tâche terminée le ${new Date().toLocaleDateString()} à ${new Date().toLocaleTimeString()}`;
+            }
+            
+            // Afficher le conteneur des résultats
+            document.getElementById('results-container').style.display = 'block';
+        }
+        
+        function closeResults() {
+            document.getElementById('results-container').style.display = 'none';
+        }
+
+        function showNotification(message) {
+            const notificationDiv = document.getElementById('notification');
+            notificationDiv.textContent = message;
+            notificationDiv.style.display = 'block';
+            setTimeout(() => {
+                notificationDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // --- LOGIQUE DU WORKFLOW ---
+        function activateNextStep(initial = false) {
+            deactivateAllCells();
+            if (!initial) {
+                workflowState++;
+            }
+            
+            const instructionDiv = document.getElementById('instruction');
+            instructionDiv.style.display = 'block';
+
+            switch(workflowState) {
+                case 0: // D1
+                    document.getElementById('d1-cell').classList.remove('inactive-cell');
+                    document.getElementById('d1-cell').classList.add('active-cell');
+                    instructionDiv.textContent = "Commencez par sélectionner une valeur dans D1 (Choisir)";
+                    break;
+                case 1: // A2 (Début)
+                    document.getElementById('a2-cell').classList.remove('inactive-cell');
+                    document.getElementById('a2-cell').classList.add('active-cell');
+                    instructionDiv.textContent = "Cliquez sur 'Début du tache'";
+                    break;
+                case 2: // A1
+                    document.getElementById('a1-cell').classList.remove('inactive-cell');
+                    document.getElementById('a1-cell').classList.add('active-cell');
+                    instructionDiv.textContent = "Sélectionnez une valeur dans A1 (Locale)";
+                    break;
+                case 3: // C2
+                    document.getElementById('c2-cell').classList.remove('inactive-cell');
+                    document.getElementById('c2-cell').classList.add('active-cell');
+                    instructionDiv.textContent = "Faites un choix (Vert/Rouge) pour chaque option dans C2";
+                    break;
+                case 4: // C3
+                    document.getElementById('c3-cell').classList.remove('inactive-cell');
+                    document.getElementById('c3-cell').classList.add('active-cell');
+                    instructionDiv.textContent = "Faites un choix dans C3";
+                    break;
+                case 5: // A4/B4/C4/D4
+                    currentCellIndex = 0;
+                    activateSingleWorkflowCell();
+                    break;
+                case 6: // A3 (Fin)
+                    document.getElementById('a3-cell').classList.remove('inactive-cell');
+                    document.getElementById('a3-cell').classList.add('active-cell');
+                    instructionDiv.textContent = "Cliquez sur 'Fin du tache' pour terminer";
+                    break;
+                default:
+                    instructionDiv.style.display = 'none';
+            }
+        }
+
+        function activateSingleWorkflowCell() {
+            if (currentCellIndex >= workflowCells.length) {
+                workflowState = 5;
+                activateNextStep();
+                return;
+            }
+
+            const currentCellId = workflowCells[currentCellIndex];
+            const currentCell = document.getElementById(currentCellId);
+            
+            deactivateAllCells(); // Désactiver toutes les cellules
+            currentCell.classList.remove('inactive-cell');
+            currentCell.classList.add('active-cell');
+            document.getElementById('instruction').textContent = `Sélectionnez une valeur pour la cellule ${currentCellId.toUpperCase().replace('-CELL', '')} (7s)`;
+
+            startTimer();
+        }
+
+        function deactivateAllCells() {
+            const cells = document.querySelectorAll('td:not(.transparent-cell)');
+            cells.forEach(cell => {
+                cell.classList.remove('active-cell', 'selected-cell');
+                cell.classList.add('inactive-cell');
+            });
+        }
+
+        // --- FONCTIONS DES MENUS DÉROULANTS ---
+        function toggleDropdown(cell) {
+            let dropdown = cell.querySelector(".dropdown");
+            if (!dropdown) return;
+            
+            let isVisible = dropdown.style.display === "block";
+            document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+            dropdown.style.display = isVisible ? "none" : "block";
+        }
+
+        function chooseValue(optionDiv, specialValue = null) {
+            let cell = optionDiv.closest("td");
+            let valueDisplay = cell.querySelector(".cell-value");
+            if (!valueDisplay) return;
+
+            let value = specialValue ? specialValue : optionDiv.textContent.trim();
+            valueDisplay.textContent = value;
+            
+            toggleDropdown(cell);
+
+            const cellId = cell.id;
+            if (cellId === 'd1-cell' || cellId === 'a1-cell') {
+                setTimeout(activateNextStep, 200);
+            } else if (workflowCells.includes(cellId)) {
+                cell.classList.add('selected-cell');
+                clearInterval(timer);
+                document.getElementById('timer-display').style.display = 'none';
+
+                currentCellIndex++;
+                setTimeout(activateSingleWorkflowCell, 200);
+            }
+        }
+        
+        // --- GESTION DU TIMER POUR LES CASES A4-D4 ---
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 7;
+            document.getElementById('timer-display').style.display = 'block';
+            updateTimerDisplay();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
                 
-                // Afficher la notification de succès
-                showNotification('La tâche a été envoyée avec succès !');
-              } else {
-                console.error('Échec de l\'envoi des données');
-                showNotification('Erreur lors de l\'envoi des données. Veuillez réessayer.', false);
-              }
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('timer-display').style.display = 'none';
+                    currentCellIndex++;
+                    activateSingleWorkflowCell();
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const timerDisplay = document.getElementById('timer-display');
+            timerDisplay.textContent = `Temps restant : ${timeLeft} secondes`;
+            if (timeLeft <= 3) {
+                timerDisplay.style.backgroundColor = '#f44336';
+            } else {
+                timerDisplay.style.backgroundColor = '#ff9800';
+            }
+        }
+
+        // --- LOGIQUE SPÉCIFIQUE À C2 ---
+        function updateTextColor(option, color) {
+            const textElement = document.getElementById(`${option}-text`);
+            textElement.classList.remove('text-red', 'text-green');
+            if (color === 'red') textElement.classList.add('text-red');
+            else if (color === 'green') textElement.classList.add('text-green');
+
+            const vertCheckbox = document.getElementById(`${option}-vert`);
+            const rougeCheckbox = document.getElementById(`${option}-rouge`);
+            if (color === 'red' && rougeCheckbox.checked) vertCheckbox.checked = false;
+            else if (color === 'green' && vertCheckbox.checked) rougeCheckbox.checked = false;
+            
+            if(vertCheckbox.checked || rougeCheckbox.checked) {
+                c2CompletedOptions.add(option);
+            } else {
+                c2CompletedOptions.delete(option);
+            }
+
+            document.querySelector('#c2-cell .cell-value').textContent = `${c2CompletedOptions.size}/${c2TotalOptions} cochés`;
+            updateCellColor('c2-cell', 'c2');
+
+            if (c2CompletedOptions.size === c2TotalOptions && workflowState === 3) {
+                setTimeout(activateNextStep, 500);
+            }
+        }
+
+        // --- LOGIQUE SPÉCIFIQUE À C3 ---
+        function updateC3TextColor(option) {
+            const personneCheckbox = document.getElementById('personne-checkbox');
+            const xylophaseCheckbox = document.getElementById('xylophase-checkbox');
+            
+            if (option === 'personne' && personneCheckbox.checked) xylophaseCheckbox.checked = false;
+            else if (option === 'xylophase' && xylophaseCheckbox.checked) personneCheckbox.checked = false;
+
+            updateCellColor('c3-cell', 'c3');
+
+            if((personneCheckbox.checked || xylophaseCheckbox.checked) && workflowState === 4) {
+                setTimeout(activateNextStep, 500);
+            }
+        }
+        
+        // --- FONCTIONS UTILITAIRES ---
+        function updateCellColor(cellId, type) {
+            const cell = document.getElementById(cellId);
+            cell.classList.remove('cell-red', 'cell-green');
+
+            if (type === 'c2') {
+                const hasRed = document.querySelectorAll('#c2-cell input[id$="-rouge"]:checked').length > 0;
+                if (hasRed) cell.classList.add('cell-red');
+                else if (c2CompletedOptions.size > 0) cell.classList.add('cell-green');
+            } else if (type === 'c3') {
+                if (document.getElementById('xylophase-checkbox').checked) cell.classList.add('cell-red');
+                else if (document.getElementById('personne-checkbox').checked) cell.classList.add('cell-green');
+            }
+        }
+        
+        function resetC2() {
+            document.querySelectorAll('#c2-cell input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('#c2-cell .option-text').forEach(txt => txt.classList.remove('text-red', 'text-green'));
+            updateCellColor('c2-cell', 'c2');
+            c2CompletedOptions.clear();
+            document.querySelector('#c2-cell .cell-value').textContent = 'C2';
+        }
+
+        function resetC3() {
+            document.querySelectorAll('#c3-cell input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('#c3-cell .option-text').forEach(txt => txt.classList.remove('text-red', 'text-green'));
+            updateCellColor('c3-cell', 'c3');
+            document.querySelector('#c3-cell .cell-value').textContent = 'C3';
+        }
+
+        // Fermer les dropdowns si on clique ailleurs
+        document.addEventListener("click", function(e) {
+            if (!e.target.closest("td") || e.target.closest(".dropdown")) {
+                document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
             }
         });
-    </script>      
+        
+        // Fermer le conteneur des résultats avec la touche Échap
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape") {
+                closeResults();
+            }
+        });
+    </script>
+
 </body>
 </html>
