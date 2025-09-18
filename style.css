@@ -1,0 +1,518 @@
+/* style.css */
+
+:root {
+    --primary-color: #0056b3;
+    --primary-hover-color: #00448a;
+    --success-color: #28a745;
+    --success-hover-color: #218838;
+    --text-color: #333;
+    --secondary-text-color: #6c757d;
+    --border-color: #e0e0e0;
+    --bg-color: #f8f9fa;
+    --card-bg-color: #ffffff;
+    --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
+    /* Nouvelle couleur pour les cases obligatoires */
+    --required-color: #ffc107; /* Jaune */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 8px;
+}
+
+.container {
+    width: 98%;
+    max-width: 450px;
+    background: var(--card-bg-color);
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    background-color: var(--card-bg-color);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    padding: 4px;
+    text-align: center;
+    word-break: break-word;
+    box-sizing: border-box;
+}
+
+/* Style initial pour les cases obligatoires */
+.cell.required-yellow {
+    background-color: var(--required-color);
+}
+.cell.required-yellow:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Texte principal unifié */
+.cell-content {
+    font-weight: 500;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 2px;
+    box-sizing: border-box;
+    font-size: 11px;
+}
+
+/* Pour les boutons */
+.cell button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    padding: 3px;
+    font-size: 9px;
+}
+
+/* Texte des placeholders */
+.cell-content.placeholder {
+    font-style: italic;
+    color: var(--secondary-text-color);
+    font-size: 9px;
+}
+
+/* Ajustement spécifique pour le texte "Sélectionnez Locale" */
+.placeholder-text {
+    color: #888;
+    font-style: italic;
+    font-size: 9px !important;
+}
+
+.cell#c2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.cell:hover:not(.empty-cell):not(.default-user-active) {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-light);
+}
+
+.empty-cell {
+    background-color: var(--bg-color);
+    border: 1px dashed var(--border-color);
+    cursor: default;
+}
+
+/* Texte spécifique pour C2 */
+#c2 .cell-content {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.cell .button-container {
+    display: flex;
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.cell .choice-button {
+    flex-grow: 1;
+    height: 80%;
+    background: var(--bg-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.2s;
+    font-size: 11px;
+}
+
+.cell .choice-button:hover {
+    background: var(--primary-color);
+    color: white;
+}
+.cell-footer {
+    font-size: 9px;
+    color: #555;
+    margin-top: 2px;
+    text-align: center;
+}
+/* Ajustement pour les dropdown des cases facultatives */
+.optional-cell .dropdown-menu {
+    top: calc(100% + 3px);
+    bottom: auto;
+}
+
+/* S'assurer que les dropdown sont visibles */
+.dropdown-menu {
+    z-index: 1000;
+}
+
+/* Styles pour la liste des lieux */
+.location-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.location-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+.location-item {
+    padding: 3px 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--card-bg-color);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 9px;
+    margin: 1px 0;
+    box-sizing: border-box;
+}
+
+.location-item:hover {
+    background-color: #e9ecef;
+}
+
+.location-item.empty {
+    font-style: italic;
+    color: var(--secondary-text-color);
+}
+
+.list-add-button {
+    padding: 2px 4px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 12px;
+    width: 100%;
+    margin-top: auto;
+}
+
+.list-add-button:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.add-button {
+    width: 100%;
+    padding: 5px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.add-button:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 3px);
+    left: 0;
+    width: 100%;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100; /* Ajouté ou modifié */
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.dropdown-menu.show { display: block; }
+
+.dropdown-item {
+    padding: 6px 8px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+}
+
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item:hover { background-color: var(--bg-color); }
+.dropdown-item-content { flex-grow: 1; }
+
+.add-item {
+    font-size: 14px;
+    padding: 5px 10px;
+    color: var(--primary-color);
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Styles pour le texte et le fond de la case C3 */
+#c3.text-green {
+    background-color: #99ff99;
+    color: #28a745;
+}
+
+#c3.text-red {
+    background-color: #ff9999;
+    color: #dc3545;
+}
+
+.default-user {
+    opacity: 0.8;
+    font-style: italic;
+    font-weight: 500;
+}
+
+.default-user-active {
+    cursor: default;
+    background-color: #e9f0f6;
+    border-color: var(--primary-color);
+}
+
+/* Styles pour les items de la liste dans C2 */
+.location-item.text-green-c2 {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+}
+
+.location-item.text-red-c2 {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+}
+
+/* --- NOUVEAU : Styles pour la case C2 condensée --- */
+.c2-condensed-green {
+    background-color: #99ff99;
+    color: #28a745;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.c2-condensed-red {
+    background-color: #ff9999;
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#refresh-button {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    width: 100%;
+}
+
+#refresh-button:hover {
+    background-color: var(--success-hover-color);
+    transform: translateY(-1px);
+}
+
+#notification-banner {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    background-color: var(--success-color);
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s;
+    pointer-events: none;
+    max-width: 90%;
+    text-align: center;
+    font-size: 12px;
+}
+
+#notification-banner.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Scrollbar Style */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+}
+
+/* Styles pour les boutons d'action dans A1 */
+#a1 .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%;
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    padding: 0 5px;
+    box-sizing: border-box;
+}
+
+.pause-btn, .fin-btn {
+    padding: 2px 4px;
+    border: 1px solid var(--border-color);
+    border-radius: 2px;
+    background-color: #f8f9fa;
+    color: var(--text-color);
+    font-size: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pause-btn:hover {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+}
+
+.fin-btn:hover {
+    background-color: #d4edda;
+    border-color: #28a745;
+}
+
+/* Ajustement pour le contenu de A1 */
+#a1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-bottom: 40px; /* Espace pour les boutons */
+}
+
+/* Style pour les cases facultatives (vert) */
+.optional-cell {
+    background-color: #e8f5e8 !important;
+    border-color: #a8d8a8 !important;
+}
+
+.optional-cell .cell-content {
+    color: var(--success-color); /* Texte en vert foncé */
+    font-weight: 600; /* Plus de gras */
+    font-style: normal; /* Pas d'italique */
+}
+
+.optional-cell:hover {
+    background-color: #d4edda !important;
+    border-color: #28a745 !important;
+}
+
+/* Styles pour le tableau de résultats */
+#task-results-table-container {
+    margin-top: 20px;
+    width: 100%;
+    overflow-x: auto; /* Permet le défilement horizontal si le tableau est large */
+}
+
+#task-results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+    margin-top: 15px;
+}
+
+#task-results-table th,
+#task-results-table td {
+    border: 1px solid #ddd;
+    padding: 4px;
+    text-align: left;
+}
+
+#task-results-table thead th {
+    background-color: #e9ecef;
+    position: sticky; /* Rend les en-têtes fixes lors du défilement vertical */
+    top: 0;
+    z-index: 1;
+}
+
+#task-results-table tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+#task-results-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Ligne de fond alternée pour une meilleure lisibilité */
+}
