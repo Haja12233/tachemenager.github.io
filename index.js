@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const locationsWithColor = JSON.parse(value);
                         if (Array.isArray(locationsWithColor)) {
                             // C'est une liste, on l'affiche en mode détaillé
-                            showC2LocationList();
+                            showC2LocationList(locationsWithColor);
                             const container = cell.querySelector('.location-list');
                             container.innerHTML = '';
                             locationsWithColor.forEach(loc => {
@@ -152,6 +152,19 @@ document.addEventListener('DOMContentLoaded', function () {
     function createDropdownItem(text) {
         const item = document.createElement('div');
         item.className = 'dropdown-item';
+        const span = document.createElement('span');
+        span.className = 'dropdown-item-content';
+        span.textContent = text;
+        item.appendChild(span);
+        return item;
+    }
+     // --- NOUVEAU : Fonction pour créer un élément de menu pour un bouton ---
+     function createDropdownButtonItem(text, id) {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.id = id; // Ajouter un ID pour identification
+        item.style.fontWeight = 'bold';
+        item.style.cursor = 'pointer'; // S'assurer que le curseur indique que c'est cliquable
         const span = document.createElement('span');
         span.className = 'dropdown-item-content';
         span.textContent = text;
@@ -367,7 +380,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             // --- MODIFIE : Ne plus retirer/ajouter text-green pour A1/D1 ici ---
-            cell.classList.remove('text-green', 'text-red', 'default-user-active', 'c2-condensed-green', 'c2-condensed-red');
+            // --- NOUVEAU : Retirer aussi la classe user-locale-selected ---
+            cell.classList.remove('text-green', 'text-red', 'default-user-active', 'c2-condensed-green', 'c2-condensed-red', 'user-locale-selected');
+            // --- FIN NOUVEAU ---
             if (['a1', 'c2', 'c3', 'd1'].includes(id)) {
                 cell.classList.add('required-yellow');
             }
@@ -377,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
         defaultUser = null;
         defaultUserExpiry = null;
         localStorage.removeItem('defaultUserD1');
-        updateA1Menu();
+        updateA1Menu(); // Met à jour le menu A1 (y compris les boutons)
         updateD1MenuWithDefault();
         showNotification('Toutes les cases ont été réinitialisées ! 🔄');
     }
@@ -424,6 +439,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 // --- MODIFIE : Ne plus ajouter text-green ici ---
                 // cell.classList.add('text-green', 'default-user-active'); // <-- Ligne modifiée
                 cell.classList.add('default-user-active');
+                // --- NOUVEAU : Ajouter la classe pour le fond vert ---
+                cell.classList.add('user-locale-selected');
+                // --- FIN NOUVEAU ---
                 updateD1MenuWithDefault();
             } else {
                 localStorage.removeItem('defaultUserD1');
@@ -441,6 +459,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // --- MODIFIE : Ne plus ajouter text-green ici ---
         // cell.classList.add('text-green', 'default-user-active'); // <-- Ligne modifiée
         cell.classList.add('default-user-active');
+        // --- NOUVEAU : Ajouter la classe pour le fond vert ---
+        // La fonction setDefaultUser ajoute 'default-user-active'. On peut l'utiliser ou ajouter 'user-locale-selected' aussi.
+        // Pour plus de cohérence visuelle, ajoutons 'user-locale-selected' ici aussi.
+        cell.classList.add('user-locale-selected');
+        // --- FIN NOUVEAU ---
         saveDefaultUser();
         updateD1MenuWithDefault();
         showNotification(`Utilisateur "${defaultUser}" défini par défaut pour 8h !`);
@@ -462,27 +485,48 @@ document.addEventListener('DOMContentLoaded', function () {
         addItem.classList.add('add-item');
         menu.appendChild(addItem);
     }
-    // Fonctions pour la cellule A1 (Locale)
+    // Fonctions pour la cellule A1 (Locale) - MODIFIEES
     function updateA1Menu() {
         const menu = document.querySelector('#a1 .dropdown-menu');
         menu.innerHTML = '';
         initialLocales.forEach(locale => {
             menu.appendChild(createDropdownItem(locale));
         });
+
+        // --- NOUVEAU : Ajouter les boutons dans le menu déroulant si une locale est sélectionnée ---
+        if (selectedLocale) {
+            // Ajouter un séparateur visuel
+            const separator = document.createElement('div');
+            separator.className = 'dropdown-item-separator';
+            separator.style.borderTop = '1px solid var(--border-color)';
+            separator.style.margin = '4px 0';
+            menu.appendChild(separator);
+
+            // Créer et ajouter le bouton PAUSE
+            const pauseItem = createDropdownButtonItem('⏸️ PAUSE', 'dropdown-pause-btn-a1');
+            // Appliquer le style initial ou le style "en pause"
+            if (isTaskPaused) {
+                pauseItem.style.backgroundColor = 'var(--required-color)'; // Jaune
+                pauseItem.querySelector('.dropdown-item-content').textContent = '⏯️ REPRENDRE'; // Texte dynamique
+            }
+            menu.appendChild(pauseItem);
+
+            // Créer et ajouter le bouton FIN
+            const finItem = createDropdownButtonItem('⏹️ FIN', 'dropdown-fin-btn-a1');
+            finItem.style.color = 'var(--success-color)'; // Vert
+            menu.appendChild(finItem);
+        }
+        // --- FIN NOUVEAU ---
     }
+    // --- MODIFIE : showA1Buttons ne crée plus les boutons dans la cellule ---
     function showA1Buttons() {
-        const a1Cell = document.getElementById('a1');
-        let buttonContainer = a1Cell.querySelector('.action-buttons');
-        if (!buttonContainer) {
-            buttonContainer = document.createElement('div');
-            buttonContainer.className = 'action-buttons';
-            buttonContainer.innerHTML = `
-                <button class="pause-btn">PAUSE</button>
-                <button class="fin-btn">FIN</button>
-            `;
-            a1Cell.appendChild(buttonContainer);
-            a1Cell.querySelector('.fin-btn').addEventListener('click', handleFinTask);
-            a1Cell.querySelector('.pause-btn').addEventListener('click', handlePauseTask);
+        // Les boutons sont maintenant dans le menu déroulant.
+        // On met à jour le menu pour y inclure les boutons.
+        updateA1Menu();
+        // Optionnel : Masquer les anciens boutons si ils existent encore (par sécurité)
+        const oldButtonContainer = document.getElementById('a1').querySelector('.action-buttons');
+        if (oldButtonContainer) {
+            oldButtonContainer.style.display = 'none'; // Ou oldButtonContainer.remove();
         }
     }
     // Fonctions pour la cellule C2
@@ -523,6 +567,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (addButton) {
             addButton.addEventListener('click', function (e) {
                 e.stopPropagation();
+                // --- MODIFIE : Appeler la nouvelle fonction handleListAdd ---
                 handleListAdd(c2Cell);
             });
         }
@@ -604,7 +649,6 @@ document.addEventListener('DOMContentLoaded', function () {
             menu.appendChild(createDropdownItem(itemText));
         });
     }
-
     function updateC4Menu() {
         const menu = document.querySelector('#c4 .dropdown-menu');
         menu.innerHTML = '';
@@ -679,17 +723,49 @@ document.addEventListener('DOMContentLoaded', function () {
                     contentSpan.classList.remove('placeholder');
                 }
                 if (cell.id === 'a1') {
-                    selectedLocale = newText;
-                    cell.classList.remove('required-yellow');
-                    // --- MODIFIE : Ne plus ajouter text-green ici ---
-                    // cell.classList.add('text-green'); // <-- Ligne supprimée
-                    loadControlLocationsForLocale(selectedLocale, false); // Charger depuis Google Sheet
-                    document.getElementById('a2').querySelector('.cell-content').textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-                    document.getElementById('a2').classList.remove('placeholder');
-                    taskStartTime = new Date();
-                    showA1Buttons();
-                    document.getElementById('a1').querySelector('.pause-btn').style.display = 'block';
-                    document.getElementById('a1').querySelector('.fin-btn').style.display = 'block';
+                    // Vérifier si le clic est sur un bouton du menu (et non une locale)
+                    const itemId = item.id;
+                    if (itemId === 'dropdown-pause-btn-a1') {
+                        // Gérer le clic sur le bouton PAUSE du menu
+                        handlePauseTask();
+                        // Mettre à jour l'apparence du bouton dans le menu
+                         const pauseBtnInMenu = document.getElementById('dropdown-pause-btn-a1');
+                         if (pauseBtnInMenu) {
+                             if (isTaskPaused) {
+                                 pauseBtnInMenu.style.backgroundColor = 'var(--required-color)'; // Jaune
+                                 pauseBtnInMenu.querySelector('.dropdown-item-content').textContent = '⏯️ REPRENDRE';
+                             } else {
+                                 pauseBtnInMenu.style.backgroundColor = ''; // Réinitialiser
+                                 pauseBtnInMenu.querySelector('.dropdown-item-content').textContent = '⏸️ PAUSE';
+                             }
+                         }
+                        // Fermer le menu
+                        this.classList.remove('show');
+                        activeMenu = null;
+                        return; // Arrêter le traitement
+                    } else if (itemId === 'dropdown-fin-btn-a1') {
+                        // Gérer le clic sur le bouton FIN du menu
+                        handleFinTask();
+                        // Fermer le menu
+                        this.classList.remove('show');
+                        activeMenu = null;
+                        return; // Arrêter le traitement
+                    } else {
+                        // Clic sur une locale
+                        selectedLocale = newText;
+                        cell.classList.remove('required-yellow');
+                        // --- NOUVEAU : Ajouter la classe pour le fond vert ---
+                        cell.classList.add('user-locale-selected');
+                        // --- FIN NOUVEAU ---
+                        loadControlLocationsForLocale(selectedLocale, false); // Charger depuis Google Sheet
+                        document.getElementById('a2').querySelector('.cell-content').textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                        document.getElementById('a2').classList.remove('placeholder');
+                        taskStartTime = new Date();
+                        showA1Buttons(); // Met à jour le menu pour inclure les boutons
+                        // Ancien code pour les boutons dans la cellule (désormais masqué/inutile)
+                        // document.getElementById('a1').querySelector('.pause-btn').style.display = 'block';
+                        // document.getElementById('a1').querySelector('.fin-btn').style.display = 'block';
+                    }
                 } else if (cell.id === 'd1') {
                     if (newText.includes('★')) {
                         // Si on reclique sur l'utilisateur par défaut, ne rien faire
@@ -697,11 +773,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     setDefaultUser(newText);
                     cell.classList.remove('required-yellow');
-                    // --- MODIFIE : Ne plus ajouter text-green ici ---
-                    // cell.classList.add('text-green'); // <-- Ligne supprimée
+                    // --- NOUVEAU : Ajouter la classe pour le fond vert ---
+                    cell.classList.add('user-locale-selected');
+                    // --- FIN NOUVEAU ---
                 }
                 contentSpan.style.color = '';
             }
+            // Fermer le menu si un item (locale ou bouton) a été sélectionné/cliqué
             this.classList.remove('show');
             activeMenu = null;
         });
@@ -765,6 +843,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     // --- Écouteurs d'événements pour les boutons d'action ---
     document.getElementById('a1').addEventListener('click', handleA1Click);
+    // --- NOUVEAU : Ajouter un écouteur de clic à la cellule D1 pour ouvrir/fermer son menu ---
+    document.getElementById('d1').addEventListener('click', function(e) {
+        // Empêcher la propagation pour éviter de déclencher le document click plus bas
+        // qui fermerait immédiatement le menu
+        e.stopPropagation();
+        const menu = this.querySelector('.dropdown-menu');
+        if (menu) {
+            // Fermer tout autre menu actif
+            if (activeMenu && activeMenu !== menu) {
+                activeMenu.classList.remove('show');
+            }
+            // Basculer l'affichage du menu de D1
+            menu.classList.toggle('show');
+            // Mettre à jour la référence activeMenu
+            activeMenu = menu.classList.contains('show') ? menu : null;
+        }
+    });
+    // --- FIN NOUVEAU ---
     document.getElementById('refresh-button').addEventListener('click', manualRefresh);
     function handleA1Click(e) {
         // --- MODIFIE : Supprimer la condition qui empêchait le réouverture ---
@@ -774,6 +870,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (activeMenu && activeMenu !== menu) {
             activeMenu.classList.remove('show');
         }
+        // Mettre à jour le menu avant de l'afficher pour refléter l'état actuel (boutons)
+        updateA1Menu();
         menu.classList.toggle('show');
         activeMenu = menu.classList.contains('show') ? menu : null;
     }
@@ -814,48 +912,66 @@ document.addEventListener('DOMContentLoaded', function () {
     function handlePauseTask() {
         if (isTaskPaused) {
             isTaskPaused = false;
-            const pauseBtn = document.getElementById('a1').querySelector('.pause-btn');
-            pauseBtn.textContent = 'PAUSE';
-            pauseBtn.style.backgroundColor = '';
+            // const pauseBtn = document.getElementById('a1').querySelector('.pause-btn'); // Ancien bouton
+            // pauseBtn.textContent = 'PAUSE';
+            // pauseBtn.style.backgroundColor = '';
             showNotification('Tâche reprise ! ▶️');
         } else {
             isTaskPaused = true;
-            const pauseBtn = document.getElementById('a1').querySelector('.pause-btn');
-            pauseBtn.textContent = 'REPRISE';
-            pauseBtn.style.backgroundColor = 'var(--required-color)';
+            // const pauseBtn = document.getElementById('a1').querySelector('.pause-btn'); // Ancien bouton
+            // pauseBtn.textContent = 'REPRISE';
+            // pauseBtn.style.backgroundColor = 'var(--required-color)';
             showNotification('Tâche mise en pause ⏸️');
         }
+         // Mettre à jour le menu A1 pour refléter l'état du bouton pause
+         updateA1Menu();
     }
+    // --- MODIFIE : Fonction handleListAdd mise à jour ---
     function handleListAdd(cell) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = 'Nouveau lieu';
-        input.className = 'add-item-input';
-        const listContainer = cell.querySelector('.location-container');
-        listContainer.insertBefore(input, listContainer.querySelector('.list-add-button'));
-        input.focus();
-        input.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                const newLocation = input.value.trim();
-                if (newLocation) {
-                    const locationItem = document.createElement('div');
-                    locationItem.className = 'location-item';
-                    locationItem.textContent = newLocation;
-                    locationItem.dataset.colorState = '0';
-                    const list = cell.querySelector('.location-list');
-                    if (list) {
-                        list.appendChild(locationItem);
-                        // Sauvegarder immédiatement l'état mis à jour de C2
-                        updateResults();
-                    }
-                }
-                input.remove();
+        // --- MODIFIE : Utiliser prompt au lieu d'un champ de texte dans la liste ---
+        const newLocation = prompt("Veuillez entrer le nom du nouveau lieu :");
+
+        // Vérifier si l'utilisateur a annulé (null) ou entré une chaîne vide
+        if (newLocation === null) {
+            // L'utilisateur a cliqué sur "Annuler" ou a fermé la boîte de dialogue
+            // On ne fait rien.
+            return;
+        }
+
+        const trimmedLocation = newLocation.trim();
+
+        if (trimmedLocation === '') {
+            // --- MODIFIE : Utiliser alert pour les messages d'erreur ---
+            alert("Le nom du lieu ne peut pas être vide.");
+            return;
+        }
+
+        // Vérifier si le lieu existe déjà dans la liste
+        const existingItems = cell.querySelectorAll('.location-item');
+        for (let item of existingItems) {
+            if (item.textContent.trim().toLowerCase() === trimmedLocation.toLowerCase()) {
+                 alert(`Le lieu "${trimmedLocation}" existe déjà dans la liste.`);
+                 return; // Arrêter l'ajout
             }
-        });
-        input.addEventListener('blur', function () {
-            input.remove();
-        });
+        }
+
+        // Si tout est OK, créer et ajouter le nouvel élément
+        const locationItem = document.createElement('div');
+        locationItem.className = 'location-item';
+        locationItem.textContent = trimmedLocation;
+        locationItem.dataset.colorState = '0'; // État par défaut (aucune couleur)
+
+        const list = cell.querySelector('.location-list');
+        if (list) {
+            list.appendChild(locationItem);
+            // Sauvegarder immédiatement l'état mis à jour de C2
+            updateResults();
+        } else {
+             // Cas improbable, mais au cas où .location-list n'existe pas
+             alert("Erreur : Impossible de trouver la liste pour ajouter le lieu.");
+        }
     }
+    // --- FIN MODIFICATION ---
     function sendDataToSheets(data) {
         const formData = new FormData();
         for (const key in data) {
@@ -909,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     // Initialisation
     loadDefaultUser();
-    updateA1Menu();
+    updateA1Menu(); // Initialise le menu A1 (avec les boutons)
     updateA4Menu();
     // --- MODIFIE : Appeler les nouvelles fonctions pour B4 et C4 ---
     updateB4Menu(); // <-- Ajout
