@@ -478,14 +478,23 @@ h1 {
     border-color: #28a745;
 }
 
-/* Ajustement pour le contenu de A1 */
+/* S'assurer que le contenu de A1 reste centré */
 #a1 {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    padding-bottom: 40px; /* Espace pour les boutons */
+    justify-content: center; /* Centrer verticalement */
+    align-items: center;     /* Centrer horizontalement */
+    /* padding-bottom: 40px; */ /* Supprimer ou commenter ce padding si les boutons ne sont plus là */
+    padding: 4px; /* Utiliser le padding standard des autres cellules */
 }
-
+/* Optionnel : Ajuster le conteneur du texte si nécessaire */
+#a1 .cell-content {
+    /* Les styles existants devraient suffire, mais vous pouvez ajouter si besoin */
+    /* flex-grow: 1; */
+    /* display: flex; */
+    /* align-items: center; */
+    /* justify-content: center; */
+}
 /* Style pour les cases facultatives (vert) */
 .optional-cell {
     background-color: #e8f5e8 !important;
