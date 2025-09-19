@@ -1,5 +1,5 @@
-// index.js (mis à jour avec les nouvelles fonctionnalités)
-document.addEventListener('DOMContentLoaded', function() {
+// index.js (mis à jour avec les nouvelles fonctionnalités et corrections)
+document.addEventListener('DOMContentLoaded', function () {
     // Configuration et variables globales
     const initialUsers = ['Anniva', 'Tina'];
     let initialLocales = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10'];
@@ -48,8 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const locationsWithColor = Array.from(locationList.querySelectorAll('.location-item')).map(item => {
                         let c = 'none';
                         // --- MODIFIE : Utilisation des classes spécifiques à C2 ---
-                        if(item.classList.contains('text-green-c2')) c = 'green';
-                        if(item.classList.contains('text-red-c2')) c = 'red';
+                        if (item.classList.contains('text-green-c2')) c = 'green';
+                        if (item.classList.contains('text-red-c2')) c = 'red';
                         return { text: item.textContent.trim(), color: c };
                     });
                     currentValue = JSON.stringify(locationsWithColor);
@@ -61,8 +61,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else if (contentSpan) {
                 currentValue = contentSpan.textContent.trim();
-                if (cell.classList.contains('text-green')) color = 'green';
-                else if (cell.classList.contains('text-red')) color = 'red';
+                // --- MODIFIE : Ne plus sauvegarder text-green pour A1/D1 ---
+                // if (cell.classList.contains('text-green')) color = 'green'; // <-- Ligne supprimée
+                if (cell.classList.contains('text-red')) color = 'red';
+                // --- Ajout : Sauvegarder si la cellule A1/D1 a été sélectionnée ---
+                // On peut utiliser un marqueur arbitraire, par exemple vérifier si le texte n'est plus le placeholder initial
+                // Mais comme le texte est sauvegardé, on peut simplement ne pas restaurer de classe de couleur spécifique.
+                // La classe required-yellow est retirée à la sélection, ce qui suffit.
             } else if (contentButton) {
                 currentValue = contentButton.textContent.trim();
             }
@@ -122,9 +127,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (contentSpan) {
                         contentSpan.textContent = results[id].value;
                         contentSpan.classList.remove('placeholder');
+                        // --- MODIFIE : Ne plus restaurer text-green pour A1/D1 ---
                         cell.classList.remove('required-yellow', 'text-green', 'text-red');
-                        if (results[id].color === 'green') cell.classList.add('text-green');
-                        else if (results[id].color === 'red') cell.classList.add('text-red');
+                        // --- MODIFIE : Ne pas ajouter text-green automatiquement ---
+                        // if (results[id].color === 'green') cell.classList.add('text-green'); // <-- Ligne supprimée ou modifiée
+                        if (results[id].color === 'red') cell.classList.add('text-red');
+                        // --- Ajout : Si le texte n'est plus le placeholder initial, retirer required-yellow ---
+                        // Cela est déjà géré par la logique de sélection dans le code principal.
+                        // Lors du chargement, si une valeur a été sauvegardée, cela signifie qu'elle a été sélectionnée.
+                        // On retire required-yellow. La couleur visuelle dépendra du CSS de la cellule sans classe de couleur.
+                        const initialText = cell.getAttribute('data-initial-text');
+                        if (results[id].value && results[id].value !== initialText) {
+                             cell.classList.remove('required-yellow');
+                             // Ne pas ajouter de classe de couleur spécifique ici.
+                        }
                     } else if (contentButton) {
                         contentButton.textContent = results[id].value;
                     }
@@ -324,6 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     contentSpan.classList.remove('default-user');
                 }
             }
+            // --- MODIFIE : Ne plus retirer/ajouter text-green pour A1/D1 ici ---
             cell.classList.remove('text-green', 'text-red', 'default-user-active', 'c2-condensed-green', 'c2-condensed-red');
             if (['c2', 'c3'].includes(id)) {
                 cell.classList.add('required-yellow');
@@ -349,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     contentSpan.classList.remove('default-user');
                 }
             }
+            // --- MODIFIE : Ne plus retirer/ajouter text-green pour A1/D1 ici ---
             cell.classList.remove('text-green', 'text-red', 'default-user-active', 'c2-condensed-green', 'c2-condensed-red');
             if (['a1', 'c2', 'c3', 'd1'].includes(id)) {
                 cell.classList.add('required-yellow');
@@ -403,7 +421,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 cell.querySelector('.cell-content').classList.remove('placeholder');
                 cell.querySelector('.cell-content').classList.add('default-user');
                 cell.classList.remove('required-yellow');
-                cell.classList.add('text-green', 'default-user-active');
+                // --- MODIFIE : Ne plus ajouter text-green ici ---
+                // cell.classList.add('text-green', 'default-user-active'); // <-- Ligne modifiée
+                cell.classList.add('default-user-active');
                 updateD1MenuWithDefault();
             } else {
                 localStorage.removeItem('defaultUserD1');
@@ -418,7 +438,9 @@ document.addEventListener('DOMContentLoaded', function() {
         cell.querySelector('.cell-content').classList.remove('placeholder');
         cell.querySelector('.cell-content').classList.add('default-user');
         cell.classList.remove('required-yellow');
-        cell.classList.add('text-green', 'default-user-active');
+        // --- MODIFIE : Ne plus ajouter text-green ici ---
+        // cell.classList.add('text-green', 'default-user-active'); // <-- Ligne modifiée
+        cell.classList.add('default-user-active');
         saveDefaultUser();
         updateD1MenuWithDefault();
         showNotification(`Utilisateur "${defaultUser}" défini par défaut pour 8h !`);
@@ -499,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         const addButton = c2Cell.querySelector('#add-locale-c2');
         if (addButton) {
-            addButton.addEventListener('click', function(e) {
+            addButton.addEventListener('click', function (e) {
                 e.stopPropagation();
                 handleListAdd(c2Cell);
             });
@@ -509,7 +531,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadControlLocationsForLocale(locale, useSavedData = false) {
         const c2Cell = document.getElementById('c2');
         c2Cell.innerHTML = `<span class="cell-content">Chargement...</span>`;
-        
         // Si on doit utiliser les données sauvegardées (lors d'un recliquage sur C2 condensé)
         if (useSavedData) {
             const savedResults = localStorage.getItem('taskResults');
@@ -527,10 +548,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error("Erreur lors du chargement des données sauvegardées:", e);
                 }
             }
-            // Si les données sauvegardées ne sont pas valides ou absentes, 
+            // Si les données sauvegardées ne sont pas valides ou absentes,
             // on charge depuis Google Sheet comme d'habitude.
         }
-        
         // Chargement depuis Google Sheet
         const url = `${SCRIPT_URL}?locale=${encodeURIComponent(locale)}`;
         fetch(url)
@@ -575,6 +595,25 @@ document.addEventListener('DOMContentLoaded', function() {
             c2Cell.classList.add('c2-condensed-green'); // Pour le cas "xR" ou "R" simple
         }
     }
+    // --- NOUVEAU : Fonctions pour B4 et C4 ---
+    function updateB4Menu() {
+        const menu = document.querySelector('#b4 .dropdown-menu');
+        menu.innerHTML = '';
+        const items = ["Vide", "1", "2", "3"]; // Liste demandée
+        items.forEach(itemText => {
+            menu.appendChild(createDropdownItem(itemText));
+        });
+    }
+
+    function updateC4Menu() {
+        const menu = document.querySelector('#c4 .dropdown-menu');
+        menu.innerHTML = '';
+        const items = ["Vide", "1", "2", "3"]; // Liste demandée
+        items.forEach(itemText => {
+            menu.appendChild(createDropdownItem(itemText));
+        });
+    }
+    // --- FIN NOUVEAU : Fonctions pour B4 et C4 ---
     // Fonctions des nouvelles cases facultatives A4 et D4
     function updateA4Menu() {
         const menu = document.querySelector('#a4 .dropdown-menu');
@@ -594,8 +633,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Listeners et initialisation
     document.querySelectorAll('.cell').forEach(cell => {
+        // --- MODIFIE : Ajouter B4 et C4 aux listeners ---
         if (cell.id === 'b4' || cell.id === 'c4') {
-            cell.addEventListener('click', function(e) {
+            cell.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const menu = this.querySelector('.dropdown-menu');
                 if (menu) {
@@ -608,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         else if (cell.id === 'a4' || cell.id === 'd4') {
-            cell.addEventListener('click', function(e) {
+            cell.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const menu = this.querySelector('.dropdown-menu');
                 if (menu) {
@@ -623,7 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // --- Fonction pour gérer les clics sur les items de dropdown ---
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        menu.addEventListener('click', function(e) {
+        menu.addEventListener('click', function (e) {
             const item = e.target.closest('.dropdown-item');
             if (item) {
                 e.stopPropagation();
@@ -641,7 +681,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (cell.id === 'a1') {
                     selectedLocale = newText;
                     cell.classList.remove('required-yellow');
-                    cell.classList.add('text-green');
+                    // --- MODIFIE : Ne plus ajouter text-green ici ---
+                    // cell.classList.add('text-green'); // <-- Ligne supprimée
                     loadControlLocationsForLocale(selectedLocale, false); // Charger depuis Google Sheet
                     document.getElementById('a2').querySelector('.cell-content').textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
                     document.getElementById('a2').classList.remove('placeholder');
@@ -656,7 +697,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     setDefaultUser(newText);
                     cell.classList.remove('required-yellow');
-                    cell.classList.add('text-green');
+                    // --- MODIFIE : Ne plus ajouter text-green ici ---
+                    // cell.classList.add('text-green'); // <-- Ligne supprimée
                 }
                 contentSpan.style.color = '';
             }
@@ -665,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     // --- Fonction pour gérer le cycle de couleurs de C3 ---
-    document.getElementById('c3').addEventListener('click', function() {
+    document.getElementById('c3').addEventListener('click', function () {
         let state = parseInt(this.dataset.colorState || 0);
         state = (state + 1) % 3; // Cycle 0 -> 1 -> 2 -> 0
         this.classList.remove('required-yellow', 'text-green', 'text-red');
@@ -684,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateResults();
     });
     // --- MODIFIE : Fonction pour gérer les clics sur la cellule C2 ---
-    document.getElementById('c2').addEventListener('click', function(e) {
+    document.getElementById('c2').addEventListener('click', function (e) {
         const item = e.target.closest('.location-item');
         if (item) {
             // Gestion du clic sur un item de la liste (changement de couleur)
@@ -705,7 +747,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // Gestion du clic sur la cellule C2 elle-même
             const c2Cell = document.getElementById('c2');
-            
             // Si la case est actuellement condensée (affiche un résumé comme "2R" ou "xR")
             if (c2Cell.classList.contains('c2-condensed-green') || c2Cell.classList.contains('c2-condensed-red')) {
                 // Vérifier qu'un pavillon est sélectionné dans A1
@@ -726,7 +767,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('a1').addEventListener('click', handleA1Click);
     document.getElementById('refresh-button').addEventListener('click', manualRefresh);
     function handleA1Click(e) {
-        if (selectedLocale) return;
+        // --- MODIFIE : Supprimer la condition qui empêchait le réouverture ---
+        // if (selectedLocale) return; // <-- Ligne supprimée
         e.stopPropagation();
         const menu = this.querySelector('.dropdown-menu');
         if (activeMenu && activeMenu !== menu) {
@@ -792,7 +834,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const listContainer = cell.querySelector('.location-container');
         listContainer.insertBefore(input, listContainer.querySelector('.list-add-button'));
         input.focus();
-        input.addEventListener('keypress', function(e) {
+        input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 const newLocation = input.value.trim();
                 if (newLocation) {
@@ -810,7 +852,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.remove();
             }
         });
-        input.addEventListener('blur', function() {
+        input.addEventListener('blur', function () {
             input.remove();
         });
     }
@@ -825,16 +867,16 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
-        .then(result => {
-            console.log('Données envoyées avec succès:', result);
-        })
-        .catch(error => {
-            console.error('Erreur lors de l\'envoi des données:', error);
-        });
+            .then(response => response.json())
+            .then(result => {
+                console.log('Données envoyées avec succès:', result);
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'envoi des données:', error);
+            });
     }
     // --- MODIFIE : Fonction pour valider la case C2 au clic en dehors ---
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const c2Cell = document.getElementById('c2');
         const isC2Click = c2Cell.contains(e.target); // Vérifie si le clic est à l'intérieur de C2
         // Fermer les menus déroulants actifs
@@ -842,35 +884,36 @@ document.addEventListener('DOMContentLoaded', function() {
             activeMenu.classList.remove('show');
             activeMenu = null;
         }
-
         // Si la liste détaillée de C2 est actuellement affichée ET que le clic est en dehors de C2
         if (c2Cell.querySelector('.location-list') && !isC2Click) {
             // Compter les éléments colorés
             const redItems = c2Cell.querySelectorAll('.location-item.text-red-c2').length;
             const greenItems = c2Cell.querySelectorAll('.location-item.text-green-c2').length;
-            
             // Condenser la case C2 en fonction du contenu
             if (redItems > 0) {
                 condenseC2(`${redItems}R`); // Par exemple, "2R"
             } else if (greenItems > 0) {
                 condenseC2('xR'); // Par exemple, "xR" si seulement verts
             } else {
-                // Si aucun item n'a été coloré, on pourrait soit rester en liste, 
+                // Si aucun item n'a été coloré, on pourrait soit rester en liste,
                 // soit condenser différemment. Ici, on choisit de condenser comme "xR".
                 condenseC2('xR');
                 // Alternative: Ne pas condenser si rien n'a changé:
-                // return; 
+                // return;
             }
             // Sauvegarder l'état condensé
             updateResults();
         }
-        // Si le clic est en dehors de C2 et que C2 affiche autre chose (historique, état par défaut, etc.), 
+        // Si le clic est en dehors de C2 et que C2 affiche autre chose (historique, état par défaut, etc.),
         // on ne fait rien de particulier ici. La logique reste la même.
     });
     // Initialisation
     loadDefaultUser();
     updateA1Menu();
     updateA4Menu();
+    // --- MODIFIE : Appeler les nouvelles fonctions pour B4 et C4 ---
+    updateB4Menu(); // <-- Ajout
+    updateC4Menu(); // <-- Ajout
     updateD4Menu();
     loadResults();
     loadTaskHistory();
