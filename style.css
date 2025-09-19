@@ -11,8 +11,11 @@
     --bg-color: #f8f9fa;
     --card-bg-color: #ffffff;
     --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
-    /* Nouvelle couleur pour les cases obligatoires */
-    --required-color: #ffc107; /* Jaune */
+    /* Changement : Jaune pour les cases obligatoires */
+    --required-color: #FFF05C; /* Jaune or modifié */
+    /* Nouvelle couleur pour les cellules A1/D1 sélectionnées */
+    --selected-user-locale-color: #d4edda; /* Vert clair, similaire à optional-cell */
+    --selected-user-locale-border: #28a745; /* Bordure verte */
 }
 
 body {
@@ -69,12 +72,30 @@ h1 {
     box-sizing: border-box;
 }
 
-/* Style initial pour les cases obligatoires */
+/* Style pour les cases obligatoires (maintenant jaune) */
 .cell.required-yellow {
     background-color: var(--required-color);
 }
 .cell.required-yellow:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Nouveau style pour A1/D1 après sélection */
+.cell.user-locale-selected {
+    background-color: var(--selected-user-locale-color) !important;
+    border-color: var(--selected-user-locale-border) !important;
+    color: var(--success-color); /* Texte vert foncé */
+    font-weight: 600;
+}
+
+.cell.user-locale-selected .cell-content {
+    color: var(--success-color); /* S'assurer que le texte est vert */
+    font-style: normal; /* Pas d'italique */
+}
+
+.cell.user-locale-selected:hover {
+    background-color: #c3e6cb !important; /* Un peu plus foncé au survol */
+    border-color: var(--success-hover-color) !important;
 }
 
 /* Texte principal unifié */
@@ -130,7 +151,7 @@ h1 {
     padding: 4px;
 }
 
-.cell:hover:not(.empty-cell):not(.default-user-active) {
+.cell:hover:not(.empty-cell):not(.default-user-active):not(.user-locale-selected) {
     border-color: var(--primary-color);
     box-shadow: var(--shadow-light);
 }
@@ -446,9 +467,10 @@ h1 {
     transition: background-color 0.2s;
 }
 
+/* Changement : Couleur de fond du bouton Pause en Jaune au survol */
 .pause-btn:hover {
-    background-color: #fff3cd;
-    border-color: #ffc107;
+    background-color: var(--required-color); /* Jaune */
+    border-color: #e0a800;
 }
 
 .fin-btn:hover {
