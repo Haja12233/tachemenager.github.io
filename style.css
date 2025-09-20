@@ -547,3 +547,29 @@ h1 {
 #task-results-table tbody tr:nth-child(even) {
     background-color: #f9f9f9; /* Ligne de fond alternée pour une meilleure lisibilité */
 }
+/* --- NOUVEAU : Styles pour les cellules verrouillees --- */
+.cell-locked {
+    position: relative;
+    pointer-events: none; /* Empêche les interactions */
+    opacity: 0.8; /* Rendre légèrement transparent */
+}
+
+/* Ajouter un pseudo-element pour l'icône du cadenas */
+.cell-locked::after {
+    content: "🔒"; /* Unicode pour l'icône cadenas */
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 10px; /* Ajuster la taille si nécessaire */
+    z-index: 101; /* Assurer qu'il est au-dessus du contenu */
+    background-color: rgba(255, 255, 255, 0.7); /* Fond semi-transparent */
+    border-radius: 3px;
+    padding: 1px;
+}
+
+/* Optionnel : Style pour le texte de notification */
+#notification-banner {
+    /* ... styles existants ... */
+    /* Ajouter si necessaire pour qu'il apparaisse au-dessus des cadenas */
+    z-index: 1000;
+}
