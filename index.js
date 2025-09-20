@@ -1,4 +1,4 @@
-// index.js (mis à jour avec les nouvelles fonctionnalités et corrections)
+// index.js (mis à jour avec TOUTES les fonctionnalités et corrections discutées)
 document.addEventListener('DOMContentLoaded', function () {
     // Configuration et variables globales
     const initialUsers = ['Anniva', 'Tina'];
@@ -68,18 +68,40 @@ document.addEventListener('DOMContentLoaded', function () {
                 // On peut utiliser un marqueur arbitraire, par exemple vérifier si le texte n'est plus le placeholder initial
                 // Mais comme le texte est sauvegardé, on peut simplement ne pas restaurer de classe de couleur spécifique.
                 // La classe required-yellow est retirée à la sélection, ce qui suffit.
+                // --- MODIFIE : Logique de sauvegarde ---
+                // Sauvegarder si :
+                // 1. Une valeur existe
+                // 2. ET la valeur est différente du texte initial *OU* c'est une des cellules optionnelles (car "Vide" est leur état)
+                // OU si ce n'est pas une cellule optionnelle mais a une valeur différente du placeholder/initial.
             } else if (contentButton) {
                 currentValue = contentButton.textContent.trim();
             }
             const initialText = cell.getAttribute('data-initial-text');
-            if (currentValue && currentValue !== initialText) {
+            if (currentValue && (currentValue !== initialText || ['a4', 'b4', 'c4', 'd4'].includes(id))) {
                 results[id] = { value: currentValue, color: color };
             }
+            // --- FIN MODIFICATION ---
         });
         localStorage.setItem('taskResults', JSON.stringify(results));
     }
     function loadResults() {
         const savedResults = localStorage.getItem('taskResults');
+        // --- NOUVEAU : Initialiser les cellules A4,B4,C4,D4 avec "Vide" par défaut ---
+        const optionalCells = ['a4', 'b4', 'c4', 'd4'];
+        optionalCells.forEach(id => {
+             const cell = document.getElementById(id);
+             if (cell) {
+                 const contentSpan = cell.querySelector('.cell-content');
+                 if (contentSpan) {
+                     // Si aucune valeur sauvegardée, mettre "Vide"
+                     contentSpan.textContent = 'Vide';
+                     contentSpan.classList.remove('placeholder');
+                     // Ajouter une classe pour indiquer que c'est la valeur par défaut ?
+                     // Pas nécessaire si on utilise simplement 'Vide' comme texte.
+                 }
+             }
+        });
+        // --- FIN NOUVEAU ---
         if (savedResults) {
             const results = JSON.parse(savedResults);
             for (const id in results) {
@@ -206,17 +228,24 @@ document.addEventListener('DOMContentLoaded', function () {
             renderTaskResultsTable(); // Afficher le tableau au chargement
         }
     }
+    // --- MODIFIE : addToDisplayedResults avec vérification améliorée ---
     function addToDisplayedResults(taskData) {
         // Récupérer les valeurs des cellules actuelles au moment de la finalisation
         const pavillon = taskData.locale || '';
-        const debut = taskData.startTimeFormatted || ''; // Utiliser le format hh:mm
-        const fin = taskData.endTimeFormatted || ''; // Utiliser le format hh:mm
+        const debut = taskData.startTimeFormatted || ''; // Utiliser le format hh:mm:ss ou hh:mm
+        const fin = taskData.endTimeFormatted || ''; // Utiliser le format hh:mm:ss ou hh:mm
         const utilisateur = taskData.user || '';
-        // --- NOUVEAU : Vérifier les doublons de pavillon ---
+        // --- MODIFIE : Vérifier les doublons de pavillon parmi les pavillons de la liste ---
+        // Vérifier que le pavillon est dans la liste initiale ET qu'il n'est pas déjà dans les résultats
         const isDuplicate = displayedTaskResults.some(result => result.pavillon === pavillon);
-        if (isDuplicate) {
-            alert(`Le pavillon ${pavillon} a déjà été enregistré. Veuillez choisir un pavillon différent.`);
-            return; // Ne pas ajouter si c'est un doublon
+        const isInInitialList = initialLocales.includes(pavillon);
+        if (isDuplicate || !isInInitialList) {
+            if (isDuplicate) {
+                 alert(`Le pavillon ${pavillon} a déjà été enregistré.`);
+            } else {
+                 alert(`Le pavillon ${pavillon} n'est pas dans la liste des pavillons valides.`);
+            }
+            return; // Ne pas ajouter si c'est un doublon ou non valide
         }
         // Récupérer les valeurs des cellules optionnelles AU MOMENT DE L'AJOUT
         const getCellValue = (id) => {
@@ -231,8 +260,24 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             return '';
         };
-        const a4 = getCellValue('a4');
-        const b4 = getCellValue('b4');
+        // --- MODIFIE : Gestion spéciale pour les cellules A4,B4,C4,D4 ---
+        // Si elles sont à leur état par défaut (placeholder), retourner "Vide"
+        const getCellValueOrDefault = (id) => {
+             const cell = document.getElementById(id);
+             if (!cell) return '';
+             const contentSpan = cell.querySelector('.cell-content');
+             if (contentSpan && contentSpan.classList.contains('placeholder')) {
+                 // Vérifier si c'est une des cellules concernées
+                 if (['a4', 'b4', 'c4', 'd4'].includes(id)) {
+                     return 'Vide'; // Valeur par défaut persistante
+                 }
+             }
+             // Sinon, utiliser la logique normale
+             return getCellValue(id);
+        };
+        // --- FIN MODIFICATION ---
+        const a4 = getCellValueOrDefault('a4');
+        const b4 = getCellValueOrDefault('b4');
         const c2Raw = getCellValue('c2');
         let c2 = '';
         // Déterminer la valeur de C2 en fonction de son état condensé ou détaillé
@@ -261,8 +306,8 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             c3Value = c3ContentSpan ? c3ContentSpan.textContent.trim() : '';
         }
-        const c4 = getCellValue('c4');
-        const d4 = getCellValue('d4');
+        const c4 = getCellValueOrDefault('c4');
+        const d4 = getCellValueOrDefault('d4');
         // Créer un objet pour la ligne du tableau
         const tableRowData = {
             pavillon, debut, fin, utilisateur,
@@ -279,6 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
         saveTaskHistory(); // Met à jour displayedTaskResults dans localStorage
         renderTaskResultsTable(); // --- CLÉ : Afficher/mettre à jour le tableau ---
     }
+    // --- MODIFIE : renderTaskResultsTable pour afficher les heures ---
     function renderTaskResultsTable() {
         const container = document.getElementById('task-results-table-container');
         if (!container) return;
@@ -305,10 +351,38 @@ document.addEventListener('DOMContentLoaded', function () {
             <tbody>
         `;
         displayedTaskResults.forEach((row, index) => {
+            // --- NOUVEAU : Extraire et formater l'heure de début ---
+            let formattedDebut = '';
+            if (row.debut) {
+                // Supposons que row.debut est au format "HH:MM:SS" ou "HH:MM"
+                const timeParts = row.debut.split(':');
+                if (timeParts.length >= 2) {
+                    // Prendre seulement HH:MM
+                    formattedDebut = `${timeParts[0]}:${timeParts[1]}`;
+                } else {
+                    // Si le format est inattendu, afficher tel quel
+                    formattedDebut = row.debut;
+                }
+            }
+            // --- NOUVEAU : Extraire et formater l'heure de fin ---
+            let formattedFin = '';
+            if (row.fin) {
+                // Supposons que row.fin est au format "HH:MM:SS" ou "HH:MM"
+                const timeParts = row.fin.split(':');
+                if (timeParts.length >= 2) {
+                    // Prendre seulement HH:MM
+                    formattedFin = `${timeParts[0]}:${timeParts[1]}`;
+                } else {
+                    // Si le format est inattendu, afficher tel quel
+                    formattedFin = row.fin;
+                }
+            }
             tableHTML += `<tr style="border-bottom: 1px solid #ddd;">`;
             tableHTML += `<td style="border: 1px solid #ddd; padding: 4px;">${row.pavillon || ''}</td>`;
-            tableHTML += `<td style="border: 1px solid #ddd; padding: 4px;">${row.debut || ''}</td>`;
-            tableHTML += `<td style="border: 1px solid #ddd; padding: 4px;">${row.fin || ''}</td>`;
+            // --- MODIFIE : Utiliser l'heure formatée ---
+            tableHTML += `<td style="border: 1px solid #ddd; padding: 4px;">${formattedDebut}</td>`;
+            tableHTML += `<td style="border: 1px solid #ddd; padding: 4px;">${formattedFin}</td>`;
+            // --- FIN MODIFICATION ---
             tableHTML += `<td style="border: 1px solid #ddd; padding: 4px;">${row.utilisateur || ''}</td>`;
             tableHTML += `<td style="border: 1px solid #ddd; padding: 4px;">${row.a4 || ''}</td>`;
             tableHTML += `<td style="border: 1px solid #ddd; padding: 4px;">${row.b4 || ''}</td>`;
@@ -336,6 +410,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         container.innerHTML = tableHTML;
     }
+    // --- FIN MODIFICATION ---
     // Fonctions de gestion des cellules
     function resetAllExceptA1D1A3() {
         const cellsToReset = ['a2', 'a4', 'b4', 'c2', 'c3', 'c4', 'd4'];
@@ -374,15 +449,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 const initialText = cell.getAttribute('data-initial-text');
                 const contentSpan = cell.querySelector('.cell-content');
                 if (contentSpan) {
-                    contentSpan.textContent = initialText;
-                    contentSpan.classList.add('placeholder');
-                    contentSpan.classList.remove('default-user');
+                     // --- MODIFIE : Pour A4/B4/C4/D4, remettre "Vide" ---
+                     if (['a4', 'b4', 'c4', 'd4'].includes(id)) {
+                         contentSpan.textContent = 'Vide';
+                         contentSpan.classList.remove('placeholder');
+                     } else {
+                         contentSpan.textContent = initialText;
+                         contentSpan.classList.add('placeholder');
+                         contentSpan.classList.remove('default-user');
+                     }
                 }
             }
             // --- MODIFIE : Ne plus retirer/ajouter text-green pour A1/D1 ici ---
-            // --- NOUVEAU : Retirer aussi la classe user-locale-selected ---
-            cell.classList.remove('text-green', 'text-red', 'default-user-active', 'c2-condensed-green', 'c2-condensed-red', 'user-locale-selected');
-            // --- FIN NOUVEAU ---
+            cell.classList.remove('text-green', 'text-red', 'default-user-active', 'c2-condensed-green', 'c2-condensed-red');
             if (['a1', 'c2', 'c3', 'd1'].includes(id)) {
                 cell.classList.add('required-yellow');
             }
@@ -492,31 +571,26 @@ document.addEventListener('DOMContentLoaded', function () {
         initialLocales.forEach(locale => {
             menu.appendChild(createDropdownItem(locale));
         });
-
-        // --- NOUVEAU : Ajouter les boutons dans le menu déroulant si une locale est sélectionnée ---
-        if (selectedLocale) {
-            // Ajouter un séparateur visuel
-            const separator = document.createElement('div');
-            separator.className = 'dropdown-item-separator';
-            separator.style.borderTop = '1px solid var(--border-color)';
-            separator.style.margin = '4px 0';
-            menu.appendChild(separator);
-
-            // Créer et ajouter le bouton PAUSE
-            const pauseItem = createDropdownButtonItem('⏸️ PAUSE', 'dropdown-pause-btn-a1');
-            // Appliquer le style initial ou le style "en pause"
-            if (isTaskPaused) {
-                pauseItem.style.backgroundColor = 'var(--required-color)'; // Jaune
-                pauseItem.querySelector('.dropdown-item-content').textContent = '⏯️ REPRENDRE'; // Texte dynamique
-            }
-            menu.appendChild(pauseItem);
-
-            // Créer et ajouter le bouton FIN
-            const finItem = createDropdownButtonItem('⏹️ FIN', 'dropdown-fin-btn-a1');
-            finItem.style.color = 'var(--success-color)'; // Vert
-            menu.appendChild(finItem);
+        // --- MODIFIE : Supprimé le 'if (selectedLocale)' pour afficher toujours les boutons ---
+        // Ajouter un séparateur visuel
+        const separator = document.createElement('div');
+        separator.className = 'dropdown-item-separator';
+        separator.style.borderTop = '1px solid var(--border-color)';
+        separator.style.margin = '4px 0';
+        menu.appendChild(separator);
+        // Créer et ajouter le bouton PAUSE
+        const pauseItem = createDropdownButtonItem('⏸️ PAUSE', 'dropdown-pause-btn-a1');
+        // Appliquer le style initial ou le style "en pause"
+        if (isTaskPaused) {
+            pauseItem.style.backgroundColor = 'var(--required-color)'; // Jaune
+            pauseItem.querySelector('.dropdown-item-content').textContent = '⏯️ REPRENDRE'; // Texte dynamique
         }
-        // --- FIN NOUVEAU ---
+        menu.appendChild(pauseItem);
+        // Créer et ajouter le bouton FIN
+        const finItem = createDropdownButtonItem('⏹️ FIN', 'dropdown-fin-btn-a1');
+        finItem.style.color = 'var(--success-color)'; // Vert
+        menu.appendChild(finItem);
+        // --- FIN MODIFICATION ---
     }
     // --- MODIFIE : showA1Buttons ne crée plus les boutons dans la cellule ---
     function showA1Buttons() {
@@ -529,6 +603,129 @@ document.addEventListener('DOMContentLoaded', function () {
             oldButtonContainer.style.display = 'none'; // Ou oldButtonContainer.remove();
         }
     }
+    // --- NOUVEAU : Fonction pour sauvegarder l'état de la tâche précédente ---
+    function savePreviousTaskState(previousLocale) {
+        // Cette fonction ressemble beaucoup à addToDisplayedResults, mais utilise les valeurs actuelles
+        // Récupérer les valeurs des cellules actuelles au moment du changement de pavillon
+        const pavillon = previousLocale || '';
+        // Heure de début actuelle (de la tâche précédente)
+        const debutElement = document.getElementById('a2').querySelector('.cell-content');
+        const debut = debutElement && !debutElement.classList.contains('placeholder') ? debutElement.textContent : '';
+        // Heure de fin : Si A3 a une valeur, on la prend. Sinon, on met l'heure actuelle ou une indication.
+        const finElement = document.getElementById('a3').querySelector('.cell-content');
+        let fin = '';
+        if (finElement && !finElement.classList.contains('placeholder')) {
+            fin = finElement.textContent;
+        } else {
+            // Si la tâche n'est pas explicitement "finie", on peut mettre "Interruption" ou l'heure actuelle.
+            // Pour plus de clarté, mettons l'heure actuelle comme heure de fin de cette tâche partielle.
+            fin = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+        // Utilisateur actuel
+        const utilisateurElement = document.getElementById('d1').querySelector('.cell-content');
+        const utilisateur = utilisateurElement && !utilisateurElement.classList.contains('placeholder') ? utilisateurElement.textContent : '';
+        // Récupérer les valeurs des cellules optionnelles AU MOMENT DU CHANGEMENT
+        const getCellValue = (id) => {
+            const cell = document.getElementById(id);
+            if (!cell) return '';
+            const contentSpan = cell.querySelector('.cell-content');
+            const contentButton = cell.querySelector('button');
+            if (contentSpan) {
+                // Si c'est le texte initial/placeholder, on considère comme "Vide"
+                // Pour simplifier ici, on retourne le texte trimmé.
+                return contentSpan.textContent.trim();
+            } else if (contentButton) {
+                return contentButton.textContent.trim();
+            }
+            return '';
+        };
+        // --- MODIFIE : Gestion spéciale pour les cellules A4,B4,C4,D4 ---
+        // Si elles sont à leur état par défaut (placeholder), retourner "Vide"
+        const getCellValueOrDefault = (id) => {
+             const cell = document.getElementById(id);
+             if (!cell) return '';
+             const contentSpan = cell.querySelector('.cell-content');
+             if (contentSpan && contentSpan.classList.contains('placeholder')) {
+                 // Vérifier si c'est une des cellules concernées
+                 if (['a4', 'b4', 'c4', 'd4'].includes(id)) {
+                     return 'Vide'; // Valeur par défaut persistante
+                 }
+             }
+             // Sinon, utiliser la logique normale
+             return getCellValue(id);
+        };
+        // --- FIN MODIFICATION ---
+        const a4 = getCellValueOrDefault('a4');
+        const b4 = getCellValueOrDefault('b4');
+        const c2Raw = getCellValue('c2');
+        let c2 = '';
+        // Déterminer la valeur de C2 en fonction de son état condensé ou détaillé
+        const c2Cell = document.getElementById('c2');
+        if (c2Cell.querySelector('.location-list')) {
+            const redCount = Array.from(c2Cell.querySelectorAll('.location-item.text-red-c2')).length;
+            if (redCount > 0) {
+                c2 = `${redCount}R`;
+            } else {
+                c2 = 'xR';
+            }
+        } else {
+            c2 = c2Raw;
+        }
+        const c3Cell = document.getElementById('c3');
+        const c3ContentSpan = c3Cell.querySelector('.cell-content');
+        let c3Value = '';
+        let c3ColorClass = '';
+        if (c3ContentSpan && c3ContentSpan.textContent.trim() === 'X') {
+            c3Value = 'X';
+            if (c3Cell.classList.contains('text-green')) {
+                c3ColorClass = 'text-green';
+            } else if (c3Cell.classList.contains('text-red')) {
+                c3ColorClass = 'text-red';
+            }
+        } else {
+            // Si C3 n'a pas de 'X', on met sa valeur textuelle ou 'Vide' si placeholder
+            if (c3ContentSpan && !c3ContentSpan.classList.contains('placeholder')) {
+                 c3Value = c3ContentSpan.textContent.trim();
+                 // Si c'est le texte initial, peut-être ne pas le sauvegarder ?
+                 // Mais pour l'historique, on veut tout. Donc on le garde.
+            } else {
+                c3Value = c3ContentSpan ? c3ContentSpan.textContent.trim() : 'Vide'; // Ou '' ?
+                // Pour être cohérent avec A4/B4, mettons 'Vide' si placeholder.
+                if (c3ContentSpan && c3ContentSpan.classList.contains('placeholder')) {
+                    c3Value = 'Vide';
+                }
+            }
+        }
+        const c4 = getCellValueOrDefault('c4');
+        const d4 = getCellValueOrDefault('d4');
+        // --- NOUVEAU : Vérifier les doublons pour l'historique aussi ---
+        const isDuplicate = displayedTaskResults.some(result => result.pavillon === pavillon);
+        const isInInitialList = initialLocales.includes(pavillon);
+        if (isDuplicate || !isInInitialList) {
+            // Ne pas sauvegarder si c'est un doublon ou non valide.
+            // On pourrait afficher une alerte, mais cela pourrait être intrusif.
+            // Pour l'instant, on ne fait rien. Si vous voulez une alerte, décommentez la ligne ci-dessous :
+            // if (isDuplicate) alert(`Historique : Le pavillon ${pavillon} a déjà été enregistré.`);
+            return;
+        }
+        // --- FIN NOUVEAU ---
+        // Créer un objet pour la ligne du tableau
+        const tableRowData = {
+            pavillon, debut, fin, utilisateur,
+            a4,
+            b4,
+            c2,
+            c3: { value: c3Value, colorClass: c3ColorClass }, // Stocker un objet avec valeur et couleur
+            c4,
+            d4
+        };
+        // Ajouter à la liste des résultats affichés
+        displayedTaskResults.push(tableRowData);
+        // Sauvegarder et afficher
+        saveTaskHistory(); // Met à jour displayedTaskResults dans localStorage
+        renderTaskResultsTable(); // --- CLÉ : Afficher/mettre à jour le tableau ---
+    }
+    // --- FIN NOUVEAU ---
     // Fonctions pour la cellule C2
     function showC2Buttons() {
         const cell = document.getElementById('c2');
@@ -723,49 +920,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     contentSpan.classList.remove('placeholder');
                 }
                 if (cell.id === 'a1') {
-                    // Vérifier si le clic est sur un bouton du menu (et non une locale)
-                    const itemId = item.id;
-                    if (itemId === 'dropdown-pause-btn-a1') {
-                        // Gérer le clic sur le bouton PAUSE du menu
-                        handlePauseTask();
-                        // Mettre à jour l'apparence du bouton dans le menu
-                         const pauseBtnInMenu = document.getElementById('dropdown-pause-btn-a1');
-                         if (pauseBtnInMenu) {
-                             if (isTaskPaused) {
-                                 pauseBtnInMenu.style.backgroundColor = 'var(--required-color)'; // Jaune
-                                 pauseBtnInMenu.querySelector('.dropdown-item-content').textContent = '⏯️ REPRENDRE';
-                             } else {
-                                 pauseBtnInMenu.style.backgroundColor = ''; // Réinitialiser
-                                 pauseBtnInMenu.querySelector('.dropdown-item-content').textContent = '⏸️ PAUSE';
-                             }
-                         }
-                        // Fermer le menu
-                        this.classList.remove('show');
-                        activeMenu = null;
-                        return; // Arrêter le traitement
-                    } else if (itemId === 'dropdown-fin-btn-a1') {
-                        // Gérer le clic sur le bouton FIN du menu
-                        handleFinTask();
-                        // Fermer le menu
-                        this.classList.remove('show');
-                        activeMenu = null;
-                        return; // Arrêter le traitement
-                    } else {
-                        // Clic sur une locale
-                        selectedLocale = newText;
-                        cell.classList.remove('required-yellow');
-                        // --- NOUVEAU : Ajouter la classe pour le fond vert ---
-                        cell.classList.add('user-locale-selected');
-                        // --- FIN NOUVEAU ---
-                        loadControlLocationsForLocale(selectedLocale, false); // Charger depuis Google Sheet
-                        document.getElementById('a2').querySelector('.cell-content').textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-                        document.getElementById('a2').classList.remove('placeholder');
-                        taskStartTime = new Date();
-                        showA1Buttons(); // Met à jour le menu pour inclure les boutons
-                        // Ancien code pour les boutons dans la cellule (désormais masqué/inutile)
-                        // document.getElementById('a1').querySelector('.pause-btn').style.display = 'block';
-                        // document.getElementById('a1').querySelector('.fin-btn').style.display = 'block';
+                    // --- NOUVEAU : Sauvegarder la tâche précédente si un pavillon était sélectionné ---
+                    if (selectedLocale && selectedLocale !== newText) {
+                        // Vérifier si les cases obligatoires pour la tâche précédente sont remplies
+                        // On peut simplifier en vérifiant juste A1, A2, A3, C2, C3, D1
+                        // Ou on peut vérifier si au moins une case autre qu'A1 a une valeur significative.
+                        // Pour plus de simplicité, on sauvegarde toujours si un pavillon différent est choisi.
+                        savePreviousTaskState(selectedLocale);
                     }
+                    // --- FIN NOUVEAU ---
+                    selectedLocale = newText;
+                    cell.classList.remove('required-yellow');
+                    // --- NOUVEAU : Ajouter la classe pour le fond vert ---
+                    cell.classList.add('user-locale-selected');
+                    // --- FIN NOUVEAU ---
+                    loadControlLocationsForLocale(selectedLocale, false); // Charger depuis Google Sheet
+                    document.getElementById('a2').querySelector('.cell-content').textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('a2').classList.remove('placeholder');
+                    taskStartTime = new Date();
+                    showA1Buttons(); // Met à jour le menu pour inclure les boutons
+                    // Ancien code pour les boutons dans la cellule (désormais masqué/inutile)
+                    // document.getElementById('a1').querySelector('.pause-btn').style.display = 'block';
+                    // document.getElementById('a1').querySelector('.fin-btn').style.display = 'block';
                 } else if (cell.id === 'd1') {
                     if (newText.includes('★')) {
                         // Si on reclique sur l'utilisateur par défaut, ne rien faire
@@ -930,22 +1106,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function handleListAdd(cell) {
         // --- MODIFIE : Utiliser prompt au lieu d'un champ de texte dans la liste ---
         const newLocation = prompt("Veuillez entrer le nom du nouveau lieu :");
-
         // Vérifier si l'utilisateur a annulé (null) ou entré une chaîne vide
         if (newLocation === null) {
             // L'utilisateur a cliqué sur "Annuler" ou a fermé la boîte de dialogue
             // On ne fait rien.
             return;
         }
-
         const trimmedLocation = newLocation.trim();
-
         if (trimmedLocation === '') {
             // --- MODIFIE : Utiliser alert pour les messages d'erreur ---
             alert("Le nom du lieu ne peut pas être vide.");
             return;
         }
-
         // Vérifier si le lieu existe déjà dans la liste
         const existingItems = cell.querySelectorAll('.location-item');
         for (let item of existingItems) {
@@ -954,13 +1126,11 @@ document.addEventListener('DOMContentLoaded', function () {
                  return; // Arrêter l'ajout
             }
         }
-
         // Si tout est OK, créer et ajouter le nouvel élément
         const locationItem = document.createElement('div');
         locationItem.className = 'location-item';
         locationItem.textContent = trimmedLocation;
         locationItem.dataset.colorState = '0'; // État par défaut (aucune couleur)
-
         const list = cell.querySelector('.location-list');
         if (list) {
             list.appendChild(locationItem);
