@@ -1,6 +1,5 @@
-// index.js (CORRIGE et COMPLET - Toutes fonctionnalites integrees)
-// Ce code est destine a etre execute apres le chargement complet du DOM.
-// Assurez-vous qu'il est appele ou encapsule correctement (ex: dans DOMContentLoaded).
+// index.js (COMPLET avec fonctionnalité Pause/Verrouillage)
+// Ce code est destiné à être exécuté après le chargement complet du DOM.
 
 // --- VARIABLES ET CONFIGURATION GLOBALES ---
 const initialUsers = ['Anniva', 'Tina'];
@@ -10,7 +9,7 @@ const requiredCells = ['a1', 'a2', 'a3', 'c2', 'c3', 'd1'];
 let activeMenu = null;
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7NrE1iwl4vthz2Sxx3DIOoRXrSkq8nolvjefXo-w-KdBaP948MGa19hRanVgR5EQK/exec';
 
-// Variables pour le suivi des taches
+// Variables pour le suivi des tâches
 let taskHistory = [];
 let currentTaskIndex = 0;
 let selectedLocale = null;
@@ -23,7 +22,7 @@ let taskEndTime = null;
 let isTaskPaused = false;
 let previousTaskEndTime = null;
 
-// Stockage pour les resultats a afficher dans le tableau
+// Stockage pour les résultats à afficher dans le tableau
 let displayedTaskResults = [];
 
 // --- FONCTIONS UTILITAIRES ---
@@ -71,7 +70,7 @@ function updateCurrentDate() {
     }
 }
 
-// --- FONCTIONS DE GESTION DES DONNEES (LocalStorage) ---
+// --- FONCTIONS DE GESTION DES DONNÉES (LocalStorage) ---
 function saveResults() {
     const results = {};
     const cellsToSave = ['a1', 'a2', 'a3', 'a4', 'b4', 'c2', 'c3', 'c4', 'd1', 'd4'];
@@ -104,8 +103,8 @@ function saveResults() {
             currentValue = contentButton.textContent.trim();
         }
         const initialText = cell.getAttribute('data-initial-text');
-        // Sauvegarder si une valeur existe et est differente du texte initial
-        // OU si c'est une cellule optionnelle (car "Vide" est leur etat)
+        // Sauvegarder si une valeur existe et est différente du texte initial
+        // OU si c'est une cellule optionnelle (car "Vide" est leur état)
         if (currentValue && (currentValue !== initialText || ['a4', 'b4', 'c4', 'd4'].includes(id))) {
             results[id] = { value: currentValue, color: color };
         }
@@ -240,7 +239,6 @@ function loadDefaultUser() {
     }
 }
 
-
 // --- FONCTIONS DE GESTION DES CELLULES ---
 function resetAllExceptA1D1A3() {
     const cellsToReset = ['a2', 'a4', 'b4', 'c2', 'c3', 'c4', 'd4'];
@@ -314,11 +312,11 @@ function checkCompletion() {
                 return false;
             }
         } else if (id === 'a3') {
-             // Verifier que A3 n'est pas dans son etat initial/placeholder
+             // Vérifier que A3 n'est pas dans son état initial/placeholder
              const contentSpan = cell.querySelector('.cell-content');
              const initialText = cell.getAttribute('data-initial-text');
              if (!contentSpan || contentSpan.textContent.trim() === initialText || contentSpan.classList.contains('placeholder')) {
-                 return false; // A3 doit avoir ete modifie (ex: "Fin" affiche)
+                 return false; // A3 doit avoir été modifié (ex: "Fin" affiché)
              }
         } else {
             const initialText = cell.getAttribute('data-initial-text');
@@ -330,7 +328,6 @@ function checkCompletion() {
     }
     return true;
 }
-
 
 // --- FONCTIONS POUR LA CELLULE D1 (Utilisateur) ---
 function setDefaultUser(name) {
@@ -372,7 +369,6 @@ function updateD1MenuWithDefault() {
     }
 }
 
-
 // --- FONCTIONS POUR LA CELLULE A1 (Locale) ---
 function updateA1Menu() {
     const menu = document.querySelector('#a1 .dropdown-menu');
@@ -382,22 +378,29 @@ function updateA1Menu() {
             menu.appendChild(createDropdownItem(locale));
         });
 
-        // Ajouter un separateur visuel
+        // Ajouter un séparateur visuel
         const separator = document.createElement('div');
         separator.className = 'dropdown-item-separator';
         separator.style.borderTop = '1px solid var(--border-color)';
         separator.style.margin = '4px 0';
         menu.appendChild(separator);
 
-        // Creer et ajouter le bouton PAUSE
-        const pauseItem = createDropdownButtonItem('⏸️ PAUSE', 'dropdown-pause-btn-a1');
-        if (isTaskPaused) {
-            pauseItem.style.backgroundColor = 'var(--required-color)';
-            pauseItem.querySelector('.dropdown-item-content').textContent = '⏯️ REPRENDRE';
-        }
-        menu.appendChild(pauseItem);
+        // Vérifier si C2 et C3 ont des valeurs pour activer le bouton PAUSE
+        const c2Cell = document.getElementById('c2');
+        const c3Cell = document.getElementById('c3');
+        const c2HasValue = c2Cell && !c2Cell.querySelector('.cell-content')?.classList.contains('placeholder');
+        const c3HasValue = c3Cell && parseInt(c3Cell.dataset.colorState || 0) > 0;
 
-        // Creer et ajouter le bouton FIN
+        // Créer et ajouter le bouton PAUSE/REPRENDRE seulement si C2 et C3 ont des valeurs
+        if (c2HasValue && c3HasValue) {
+            const pauseItem = createDropdownButtonItem(isTaskPaused ? '⏯️ REPRENDRE' : '⏸️ PAUSE', 'dropdown-pause-btn-a1');
+            if (isTaskPaused) {
+                pauseItem.style.backgroundColor = 'var(--required-color)';
+            }
+            menu.appendChild(pauseItem);
+        }
+
+        // Créer et ajouter le bouton FIN
         const finItem = createDropdownButtonItem('⏹️ FIN', 'dropdown-fin-btn-a1');
         finItem.style.color = 'var(--success-color)';
         menu.appendChild(finItem);
@@ -412,6 +415,35 @@ function showA1Buttons() {
     }
 }
 
+// --- FONCTION POUR LE BOUTON PAUSE/REPRENDRE ---
+function togglePauseResume() {
+    const cellsToLock = ['a2', 'a3', 'a4', 'b4', 'c2', 'c3', 'c4', 'd1', 'd4'];
+    
+    if (!isTaskPaused) {
+        // Mettre en pause - verrouiller les cellules
+        isTaskPaused = true;
+        cellsToLock.forEach(id => {
+            const cell = document.getElementById(id);
+            if (cell) {
+                cell.classList.add('cell-locked');
+            }
+        });
+        showNotification('Tâche mise en pause ⏸️ - Cellules verrouillées');
+    } else {
+        // Reprendre - déverrouiller les cellules
+        isTaskPaused = false;
+        cellsToLock.forEach(id => {
+            const cell = document.getElementById(id);
+            if (cell) {
+                cell.classList.remove('cell-locked');
+            }
+        });
+        showNotification('Tâche reprise ! ▶️');
+    }
+    
+    // Mettre à jour le menu A1 pour refléter le nouvel état
+    updateA1Menu();
+}
 
 // --- FONCTIONS POUR LA CELLULE C2 ---
 function showC2Buttons() {
@@ -526,7 +558,6 @@ function condenseC2(value) {
     }
 }
 
-
 // --- FONCTIONS POUR LES CELLULES A4, B4, C4, D4 ---
 function updateA4Menu() {
     const menu = document.querySelector('#a4 .dropdown-menu');
@@ -572,8 +603,7 @@ function updateD4Menu() {
     }
 }
 
-
-// --- FONCTIONS DE TRAITEMENT DES RESULTATS ET TABLEAU ---
+// --- FONCTIONS DE TRAITEMENT DES RÉSULTATS ET TABLEAU ---
 function addToDisplayedResults(taskData) {
     const pavillon = taskData.locale || '';
     const debut = taskData.startTimeFormatted || '';
@@ -715,8 +745,7 @@ function renderTaskResultsTable() {
     container.innerHTML = tableHTML;
 }
 
-
-// --- FONCTIONS DE GESTION DES EVENEMENTS ---
+// --- FONCTIONS DE GESTION DES ÉVÉNEMENTS ---
 function handleA1Click(e) {
     e.stopPropagation();
     const menu = this.querySelector('.dropdown-menu');
@@ -724,7 +753,7 @@ function handleA1Click(e) {
         if (activeMenu && activeMenu !== menu) {
             activeMenu.classList.remove('show');
         }
-        updateA1Menu(); // Toujours mettre a jour le menu avant de l'afficher
+        updateA1Menu(); // Toujours mettre à jour le menu avant de l'afficher
         menu.classList.toggle('show');
         activeMenu = menu.classList.contains('show') ? menu : null;
     }
@@ -744,19 +773,19 @@ function handleFinTask() {
             a3ContentSpan.textContent = 'Fin';
             a3ContentSpan.classList.remove('placeholder');
         }
-        // --- CAPTURE DE L'HEURE REELLE DE FIN ---
+        // --- CAPTURE DE L'HEURE RÉELLE DE FIN ---
         const realFinTime = new Date();
         const realFinTimeFormatted = realFinTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-        // --- RECUPERATION DE L'HEURE REELLE DE DEBUT DEPUIS A2 ---
+        // --- RÉCUPÉRATION DE L'HEURE RÉELLE DE DÉBUT DEPUIS A2 ---
         const a2ContentSpan = document.getElementById('a2')?.querySelector('.cell-content');
         const realStartTimeFormatted = a2ContentSpan && !a2ContentSpan.classList.contains('placeholder') ? a2ContentSpan.textContent : '';
 
         const taskData = {
             locale: selectedLocale,
             user: document.getElementById('d1')?.querySelector('.cell-content')?.textContent,
-            startTimeFormatted: realStartTimeFormatted,
-            endTimeFormatted: realFinTimeFormatted,  // Heure réelle de fin
+            startTimeFormatted: realStartTimeFormatted, // Heure réelle de début
+            endTimeFormatted: realFinTimeFormatted,     // Heure réelle de fin
             a4: document.getElementById('a4')?.querySelector('.cell-content')?.textContent,
             b4: document.getElementById('b4')?.querySelector('.cell-content')?.textContent,
             c2: document.getElementById('c2')?.querySelector('.cell-content')?.textContent,
@@ -774,17 +803,6 @@ function handleFinTask() {
     } else {
         alert('Veuillez remplir toutes les cases obligatoires (jaunes) avant de finir la tâche.');
     }
-}
-
-function handlePauseTask() {
-    if (isTaskPaused) {
-        isTaskPaused = false;
-        showNotification('Tâche reprise ! ▶️');
-    } else {
-        isTaskPaused = true;
-        showNotification('Tâche mise en pause ⏸️');
-    }
-    updateA1Menu(); // Mettre a jour l'etat du bouton PAUSE dans le menu
 }
 
 function handleListAdd(cell) {
@@ -934,8 +952,7 @@ function updateResults() {
     saveResults();
 }
 
-
-// --- INITIALISATION ET ECOUTEURS D'EVENEMENTS ---
+// --- INITIALISATION ET ÉCOUTEURS D'ÉVÉNEMENTS ---
 document.addEventListener('DOMContentLoaded', function () {
     // Initialisation
     loadDefaultUser();
@@ -947,7 +964,7 @@ document.addEventListener('DOMContentLoaded', function () {
     loadResults();
     loadTaskHistory();
 
-    // Ecouteurs generaux pour les cellules avec menus deroulants (sauf A1 et D1)
+    // Écouteurs généraux pour les cellules avec menus déroulants (sauf A1 et D1)
     document.querySelectorAll('.cell').forEach(cell => {
         if (['b4', 'c4', 'a4', 'd4'].includes(cell.id)) {
             cell.addEventListener('click', function (e) {
@@ -964,10 +981,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Ecouteur specifique pour A1
+    // Écouteur spécifique pour A1
     document.getElementById('a1')?.addEventListener('click', handleA1Click);
 
-    // Ecouteur specifique pour D1 (ACTIVATION DEMANDEE)
+    // Écouteur spécifique pour D1
     document.getElementById('d1')?.addEventListener('click', function(e) {
         e.stopPropagation();
         const menu = this.querySelector('.dropdown-menu');
@@ -980,10 +997,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Ecouteur pour le bouton Refresh
+    // Écouteur pour le bouton Refresh
     document.getElementById('refresh-button')?.addEventListener('click', manualRefresh);
 
-    // Gestion des clics sur les elements du menu deroulant (pour toutes les cellules)
+    // Gestion des clics sur les éléments du menu déroulant (pour toutes les cellules)
     document.querySelectorAll('.dropdown-menu').forEach(menu => {
         menu.addEventListener('click', function (e) {
             const item = e.target.closest('.dropdown-item');
@@ -992,6 +1009,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 const cell = this.closest('.cell');
                 const contentSpan = cell?.querySelector('.cell-content');
                 if (!contentSpan) return;
+
+                // Gérer le bouton PAUSE/REPRENDRE
+                if (item.id === 'dropdown-pause-btn-a1') {
+                    togglePauseResume();
+                    this.classList.remove('show');
+                    activeMenu = null;
+                    return;
+                }
 
                 let newText = item.querySelector('.dropdown-item-content')?.textContent.trim();
                 if (newText?.toLowerCase() === 'vide') {
@@ -1005,22 +1030,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (cell.id === 'a1') {
                     const itemId = item.id;
-                    if (itemId === 'dropdown-pause-btn-a1') {
-                        handlePauseTask();
-                        const pauseBtnInMenu = document.getElementById('dropdown-pause-btn-a1');
-                        if (pauseBtnInMenu) {
-                            if (isTaskPaused) {
-                                pauseBtnInMenu.style.backgroundColor = 'var(--required-color)';
-                                pauseBtnInMenu.querySelector('.dropdown-item-content').textContent = '⏯️ REPRENDRE';
-                            } else {
-                                pauseBtnInMenu.style.backgroundColor = '';
-                                pauseBtnInMenu.querySelector('.dropdown-item-content').textContent = '⏸️ PAUSE';
-                            }
-                        }
-                        this.classList.remove('show');
-                        activeMenu = null;
-                        return;
-                    } else if (itemId === 'dropdown-fin-btn-a1') {
+                    if (itemId === 'dropdown-fin-btn-a1') {
                         handleFinTask();
                         this.classList.remove('show');
                         activeMenu = null;
