@@ -4,14 +4,14 @@ HTML :
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrice 4x4 - Gestion de T‚che</title>
+    <title>Matrice 4x4 - Gestion de T√¢che</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="notification-banner">T‚che complËte ! ??</div>
+    <div id="notification-banner">T√¢che compl√®te ! ??</div>
 
     <div class="container">
-        <h1>Gestion des T‚ches</h1>
+        <h1>Gestion des T√¢ches</h1>
 
         <div class="grid">
             <div class="cell required-yellow" id="a1" data-initial-text="Local">
@@ -27,21 +27,21 @@ HTML :
                 <div class="dropdown-menu"></div>
             </div>
 
-            <div class="cell" id="a2" data-initial-text="DÈbut T‚che">
-                <span class="cell-content placeholder">DÈbut</span>
+            <div class="cell" id="a2" data-initial-text="D√©but T√¢che">
+                <span class="cell-content placeholder">D√©but</span>
             </div>
             <div class="cell empty-cell" id="b2"></div>
             <div class="cell required-yellow" id="c2" data-initial-text="">
-                <span class="cell-content placeholder">ContrÙle Rat</span>
+                <span class="cell-content placeholder">Contr√¥le Rat</span>
             </div>
             <div class="cell empty-cell" id="d2"></div>
 
-            <div class="cell" id="a3" data-initial-text="Fin T‚che">
+            <div class="cell" id="a3" data-initial-text="Fin T√¢che">
                 <span class="cell-content placeholder">Fin</span>
             </div>
             <div class="cell empty-cell" id="b3"></div>
-            <div class="cell required-yellow" id="c3" data-initial-text="ContrÙle Xylophage">
-                <span class="cell-content placeholder">ContrÙle Xylophage</span>
+            <div class="cell required-yellow" id="c3" data-initial-text="Contr√¥le Xylophage">
+                <span class="cell-content placeholder">Contr√¥le Xylophage</span>
             </div>
             <div class="cell empty-cell" id="d3"></div>
 
@@ -87,9 +87,9 @@ CSS :
     --card-bg-color: #ffffff;
     --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
     /* Changement : Jaune pour les cases obligatoires */
-    --required-color: #FFF05C; /* Jaune or modifiÈ */
-    /* Nouvelle couleur pour les cellules A1/D1 sÈlectionnÈes */
-    --selected-user-locale-color: #d4edda; /* Vert clair, similaire ‡ optional-cell */
+    --required-color: #FFF05C; /* Jaune or modifi√© */
+    /* Nouvelle couleur pour les cellules A1/D1 s√©lectionn√©es */
+    --selected-user-locale-color: #d4edda; /* Vert clair, similaire √† optional-cell */
     --selected-user-locale-border: #28a745; /* Bordure verte */
 }
 
@@ -155,11 +155,11 @@ h1 {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Nouveau style pour A1/D1 aprËs sÈlection */
+/* Nouveau style pour A1/D1 apr√®s s√©lection */
 .cell.user-locale-selected {
     background-color: var(--selected-user-locale-color) !important;
     border-color: var(--selected-user-locale-border) !important;
-    color: var(--success-color); /* Texte vert foncÈ */
+    color: var(--success-color); /* Texte vert fonc√© */
     font-weight: 600;
 }
 
@@ -169,11 +169,11 @@ h1 {
 }
 
 .cell.user-locale-selected:hover {
-    background-color: #c3e6cb !important; /* Un peu plus foncÈ au survol */
+    background-color: #c3e6cb !important; /* Un peu plus fonc√© au survol */
     border-color: var(--success-hover-color) !important;
 }
 
-/* Texte principal unifiÈ */
+/* Texte principal unifi√© */
 .cell-content {
     font-weight: 500;
     text-align: center;
@@ -211,7 +211,7 @@ h1 {
     font-size: 9px;
 }
 
-/* Ajustement spÈcifique pour le texte "SÈlectionnez Locale" */
+/* Ajustement sp√©cifique pour le texte "S√©lectionnez Locale" */
 .placeholder-text {
     color: #888;
     font-style: italic;
@@ -237,7 +237,7 @@ h1 {
     cursor: default;
 }
 
-/* Texte spÈcifique pour C2 */
+/* Texte sp√©cifique pour C2 */
 #c2 .cell-content {
     font-size: 12px;
     font-weight: 500;
@@ -374,7 +374,7 @@ h1 {
     border: 1px solid var(--border-color);
     border-radius: 6px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 100; /* AjoutÈ ou modifiÈ */
+    z-index: 100; /* Ajout√© ou modifi√© */
     max-height: 120px;
     overflow-y: auto;
 }
@@ -438,7 +438,7 @@ h1 {
     color: #721c24 !important;
 }
 
-/* --- NOUVEAU : Styles pour la case C2 condensÈe --- */
+/* --- NOUVEAU : Styles pour la case C2 condens√©e --- */
 .c2-condensed-green {
     background-color: #99ff99;
     color: #28a745;
@@ -553,16 +553,16 @@ h1 {
     border-color: #28a745;
 }
 
-/* S'assurer que le contenu de A1 reste centrÈ */
+/* S'assurer que le contenu de A1 reste centr√© */
 #a1 {
     display: flex;
     flex-direction: column;
     justify-content: center; /* Centrer verticalement */
     align-items: center;     /* Centrer horizontalement */
-    /* padding-bottom: 40px; */ /* Supprimer ou commenter ce padding si les boutons ne sont plus l‡ */
+    /* padding-bottom: 40px; */ /* Supprimer ou commenter ce padding si les boutons ne sont plus l√† */
     padding: 4px; /* Utiliser le padding standard des autres cellules */
 }
-/* Optionnel : Ajuster le conteneur du texte si nÈcessaire */
+/* Optionnel : Ajuster le conteneur du texte si n√©cessaire */
 #a1 .cell-content {
     /* Les styles existants devraient suffire, mais vous pouvez ajouter si besoin */
     /* flex-grow: 1; */
@@ -577,7 +577,7 @@ h1 {
 }
 
 .optional-cell .cell-content {
-    color: var(--success-color); /* Texte en vert foncÈ */
+    color: var(--success-color); /* Texte en vert fonc√© */
     font-weight: 600; /* Plus de gras */
     font-style: normal; /* Pas d'italique */
 }
@@ -587,11 +587,11 @@ h1 {
     border-color: #28a745 !important;
 }
 
-/* Styles pour le tableau de rÈsultats */
+/* Styles pour le tableau de r√©sultats */
 #task-results-table-container {
     margin-top: 20px;
     width: 100%;
-    overflow-x: auto; /* Permet le dÈfilement horizontal si le tableau est large */
+    overflow-x: auto; /* Permet le d√©filement horizontal si le tableau est large */
 }
 
 #task-results-table {
@@ -610,7 +610,7 @@ h1 {
 
 #task-results-table thead th {
     background-color: #e9ecef;
-    position: sticky; /* Rend les en-tÍtes fixes lors du dÈfilement vertical */
+    position: sticky; /* Rend les en-t√™tes fixes lors du d√©filement vertical */
     top: 0;
     z-index: 1;
 }
@@ -620,22 +620,22 @@ h1 {
 }
 
 #task-results-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9; /* Ligne de fond alternÈe pour une meilleure lisibilitÈ */
+    background-color: #f9f9f9; /* Ligne de fond altern√©e pour une meilleure lisibilit√© */
 }
 /* --- NOUVEAU : Styles pour les cellules verrouillees --- */
 .cell-locked {
     position: relative;
-    pointer-events: none; /* EmpÍche les interactions (clics, etc.) */
-    opacity: 0.7; /* Rendre lÈgËrement transparent pour l'indication visuelle */
+    pointer-events: none; /* Emp√™che les interactions (clics, etc.) */
+    opacity: 0.7; /* Rendre l√©g√®rement transparent pour l'indication visuelle */
 }
 
-/* Ajouter un pseudo-element pour l'icÙne du cadenas */
+/* Ajouter un pseudo-element pour l'ic√¥ne du cadenas */
 .cell-locked::after {
-    content: "??"; /* Unicode pour l'icÙne cadenas */
+    content: "??"; /* Unicode pour l'ic√¥ne cadenas */
     position: absolute;
     top: 2px;
     right: 2px;
-    font-size: 10px; /* Ajuster la taille si nÈcessaire */
+    font-size: 10px; /* Ajuster la taille si n√©cessaire */
     z-index: 101; /* Assurer qu'il est au-dessus du contenu de la cellule */
     background-color: rgba(255, 255, 255, 0.7); /* Fond semi-transparent pour mieux le voir */
     border-radius: 3px;
@@ -934,7 +934,7 @@ function manualRefresh() {
     localStorage.removeItem('defaultUserD1');
     updateA1Menu();
     updateD1MenuWithDefault();
-    showNotification('Toutes les cases ont ÈtÈ rÈinitialisÈes ! ??');
+    showNotification('Toutes les cases ont √©t√© r√©initialis√©es ! ??');
 }
 function checkCompletion() {
     for (const id of requiredCells) {
@@ -979,14 +979,14 @@ function setDefaultUser(name) {
     }
     saveDefaultUser();
     updateD1MenuWithDefault();
-    showNotification(`Utilisateur "${defaultUser}" dÈfini par dÈfaut pour 8h !`);
+    showNotification(`Utilisateur "${defaultUser}" d√©fini par d√©faut pour 8h !`);
 }
 function updateD1MenuWithDefault() {
     const menu = document.querySelector('#d1 .dropdown-menu');
     if (menu) {
         menu.innerHTML = '';
         if (defaultUser) {
-            const defaultItem = createDropdownItem(`? ${defaultUser} (par dÈfaut)`);
+            const defaultItem = createDropdownItem(`? ${defaultUser} (par d√©faut)`);
             defaultItem.classList.add('default-user-item');
             menu.appendChild(defaultItem);
         }
@@ -1038,7 +1038,7 @@ function showA1Buttons() {
 function showC2Buttons() {
     const cell = document.getElementById('c2');
     if (cell) {
-        cell.innerHTML = `<span class="cell-content placeholder-text">SÈlectionnez Locale</span>`;
+        cell.innerHTML = `<span class="cell-content placeholder-text">S√©lectionnez Locale</span>`;
         cell.classList.remove('c2-condensed-green', 'c2-condensed-red');
         cell.classList.add('required-yellow');
     }
@@ -1097,7 +1097,7 @@ function loadControlLocationsForLocale(locale, useSavedData = false) {
                     }
                 }
             } catch (e) {
-                console.error("Erreur lors du chargement des donnÈes sauvegardÈes:", e);
+                console.error("Erreur lors du chargement des donn√©es sauvegard√©es:", e);
             }
         }
     }
@@ -1122,7 +1122,7 @@ function loadControlLocationsForLocale(locale, useSavedData = false) {
             }
         })
         .catch(error => {
-            console.error('Erreur lors du chargement des lieux de contrÙle:', error);
+            console.error('Erreur lors du chargement des lieux de contr√¥le:', error);
             condenseC2('Erreur');
         });
 }
@@ -1194,7 +1194,7 @@ function addToDisplayedResults(taskData) {
     const isInInitialList = initialLocales.includes(pavillon);
     if (isDuplicate || !isInInitialList) {
         if (isDuplicate) {
-            alert(`Le pavillon ${pavillon} a dÈj‡ ÈtÈ enregistrÈ.`);
+            alert(`Le pavillon ${pavillon} a d√©j√† √©t√© enregistr√©.`);
         } else {
             alert(`Le pavillon ${pavillon} n'est pas dans la liste des pavillons valides.`);
         }
@@ -1269,14 +1269,14 @@ function renderTaskResultsTable() {
     const container = document.getElementById('task-results-table-container');
     if (!container) return;
     if (displayedTaskResults.length === 0) {
-        container.innerHTML = '<p style="margin-top: 15px; text-align: center;">Aucun rÈsultat ‡ afficher pour le moment.</p>';
+        container.innerHTML = '<p style="margin-top: 15px; text-align: center;">Aucun r√©sultat √† afficher pour le moment.</p>';
         return;
     }
     let tableHTML = `
     <table id="task-results-table" style="width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 15px;">
         <thead><tr style="background-color: #e9ecef;">
             <th style="border: 1px solid #ddd; padding: 4px;">Pavillon</th>
-            <th style="border: 1px solid #ddd; padding: 4px;">DÈbut</th>
+            <th style="border: 1px solid #ddd; padding: 4px;">D√©but</th>
             <th style="border: 1px solid #ddd; padding: 4px;">Fin</th>
             <th style="border: 1px solid #ddd; padding: 4px;">Utilisateur</th>
             <th style="border: 1px solid #ddd; padding: 4px;">A4</th>
@@ -1323,24 +1323,24 @@ function areC2AndC3Filled() {
     let isC2Filled = false;
     let isC3Filled = false;
 
-    // VÈrifier C2
+    // V√©rifier C2
     const c2Cell = document.getElementById('c2');
     if (c2Cell) {
         const contentSpan = c2Cell.querySelector('.cell-content');
-        // VÈrifier si le contenu se termine par 'R' (condensÈ) ou s'il y a une liste avec des ÈlÈments
+        // V√©rifier si le contenu se termine par 'R' (condens√©) ou s'il y a une liste avec des √©l√©ments
         if (contentSpan && contentSpan.textContent.trim().match(/^[0-9]+R$|^xR$/)) {
             isC2Filled = true;
         } else if (c2Cell.querySelector('.location-list')) {
-            // Si la liste est ouverte, considÈrer comme rempli (l'utilisateur a interagi)
+            // Si la liste est ouverte, consid√©rer comme rempli (l'utilisateur a interagi)
             isC2Filled = true;
         }
     }
 
-    // VÈrifier C3
+    // V√©rifier C3
     const c3Cell = document.getElementById('c3');
     if (c3Cell) {
         const c3State = parseInt(c3Cell.dataset.colorState || 0);
-        // L'Ètat 0 signifie non touchÈ. …tats 1 (vert) et 2 (rouge) signifient touchÈ.
+        // L'√©tat 0 signifie non touch√©. √âtats 1 (vert) et 2 (rouge) signifient touch√©.
         if (c3State === 1 || c3State === 2) {
             isC3Filled = true;
         }
@@ -1351,7 +1351,7 @@ function areC2AndC3Filled() {
 
 // --- NOUVELLE FONCTION : Verrouiller/Deverrouiller les cellules ---
 function toggleCellLocks(lock) {
-    // Liste des cellules qui peuvent Ítre verrouillÈes/dÈverrouillÈes
+    // Liste des cellules qui peuvent √™tre verrouill√©es/d√©verrouill√©es
     const cellsToLock = ['a1', 'a2', 'a4', 'b4', 'c2', 'c3', 'c4', 'd1', 'd4'];
     cellsToLock.forEach(id => {
         const cell = document.getElementById(id);
@@ -1366,10 +1366,10 @@ function toggleCellLocks(lock) {
 }
 
 function handleA1Click(e) {
-    // Empecher l'interaction si la t‚che est en pause
+    // Empecher l'interaction si la t√¢che est en pause
     if (isTaskPaused) {
         e.stopPropagation();
-        showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+        showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
         return;
     }
     e.stopPropagation();
@@ -1387,7 +1387,7 @@ function handleFinTask() {
     const c3Cell = document.getElementById('c3');
     const c3ColorState = parseInt(c3Cell?.dataset.colorState || 0);
     if (c3ColorState === 0) {
-        alert("Veuillez sÈlectionner une valeur pour la case 'ContrÙle Xylophage' (C3) avant de terminer la t‚che.");
+        alert("Veuillez s√©lectionner une valeur pour la case 'Contr√¥le Xylophage' (C3) avant de terminer la t√¢che.");
         return;
     }
     if (checkCompletion()) {
@@ -1419,29 +1419,29 @@ function handleFinTask() {
         sendDataToSheets(taskData);
         setTimeout(() => {
             resetAllExceptA1D1A3();
-            showNotification('T‚che complËte ! ??', true);
+            showNotification('T√¢che compl√®te ! ??', true);
         }, 1000);
     } else {
-        alert('Veuillez remplir toutes les cases obligatoires (jaunes) avant de finir la t‚che.');
+        alert('Veuillez remplir toutes les cases obligatoires (jaunes) avant de finir la t√¢che.');
     }
 }
 
 // --- FONCTION MODIFIEE : handlePauseTask ---
 function handlePauseTask() {
     if (isTaskPaused) {
-        // Si la t‚che est deja en pause, la reprendre
+        // Si la t√¢che est deja en pause, la reprendre
         isTaskPaused = false;
         toggleCellLocks(false); // Debloquer les cellules
-        showNotification('T‚che reprise ! ??');
+        showNotification('T√¢che reprise ! ??');
     } else {
-        // Si la t‚che n'est pas en pause, vÈrifier C2 et C3 avant de la mettre en pause
+        // Si la t√¢che n'est pas en pause, v√©rifier C2 et C3 avant de la mettre en pause
         if (areC2AndC3Filled()) {
             isTaskPaused = true;
             toggleCellLocks(true); // Bloquer les cellules
-            showNotification('T‚che mise en pause ??');
+            showNotification('T√¢che mise en pause ??');
         } else {
             // Message specifique pour C2 et C3
-            alert('Veuillez remplir les cases C2 et C3 avant de mettre la t‚che en pause.');
+            alert('Veuillez remplir les cases C2 et C3 avant de mettre la t√¢che en pause.');
             return; // Sortir si la condition n'est pas remplie
         }
     }
@@ -1449,22 +1449,22 @@ function handlePauseTask() {
 }
 
 function handleListAdd(cell) {
-    // Empecher l'interaction si la t‚che est en pause
+    // Empecher l'interaction si la t√¢che est en pause
     if (isTaskPaused) {
-        showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+        showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
         return;
     }
     const newLocation = prompt("Veuillez entrer le nom du nouveau lieu :");
     if (newLocation === null) return;
     const trimmedLocation = newLocation.trim();
     if (trimmedLocation === '') {
-        alert("Le nom du lieu ne peut pas Ítre vide.");
+        alert("Le nom du lieu ne peut pas √™tre vide.");
         return;
     }
     const existingItems = cell.querySelectorAll('.location-item');
     for (let item of existingItems) {
         if (item.textContent.trim().toLowerCase() === trimmedLocation.toLowerCase()) {
-            alert(`Le lieu "${trimmedLocation}" existe dÈj‡ dans la liste.`);
+            alert(`Le lieu "${trimmedLocation}" existe d√©j√† dans la liste.`);
             return;
         }
     }
@@ -1579,10 +1579,10 @@ function sendDataToSheets(data) {
     })
     .then(response => response.json())
     .then(result => {
-        console.log('DonnÈes envoyÈes avec succËs:', result);
+        console.log('Donn√©es envoy√©es avec succ√®s:', result);
     })
     .catch(error => {
-        console.error('Erreur lors de l\'envoi des donnÈes:', error);
+        console.error('Erreur lors de l\'envoi des donn√©es:', error);
     });
 }
 function updateResults() {
@@ -1600,15 +1600,15 @@ document.addEventListener('DOMContentLoaded', function () {
     loadResults();
     loadTaskHistory();
 
-    // --- NOUVEAU ECOUTEUR : Empecher l'interaction avec les cellules si la t‚che est en pause ---
+    // --- NOUVEAU ECOUTEUR : Empecher l'interaction avec les cellules si la t√¢che est en pause ---
     document.querySelectorAll('.cell').forEach(cell => {
         // Ecouteurs pour les cellules avec menus deroulants
         if (['b4', 'c4', 'a4', 'd4', 'd1'].includes(cell.id)) {
             cell.addEventListener('click', function (e) {
-                 // Empecher l'interaction si la t‚che est en pause
+                 // Empecher l'interaction si la t√¢che est en pause
                 if (isTaskPaused) {
                     e.stopPropagation();
-                    showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+                    showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
                     return;
                 }
                 e.stopPropagation();
@@ -1625,9 +1625,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Ecouteur pour C2 (liste et condensation)
         if (cell.id === 'c2') {
              cell.addEventListener('click', function (e) {
-                // Empecher l'interaction si la t‚che est en pause
+                // Empecher l'interaction si la t√¢che est en pause
                 if (isTaskPaused) {
-                    showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+                    showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
                     return;
                 }
                 const item = e.target.closest('.location-item');
@@ -1660,9 +1660,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Ecouteur pour C3 (cycle de couleurs)
         if (cell.id === 'c3') {
              cell.addEventListener('click', function () {
-                // Empecher l'interaction si la t‚che est en pause
+                // Empecher l'interaction si la t√¢che est en pause
                 if (isTaskPaused) {
-                    showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+                    showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
                     return;
                 }
                 let state = parseInt(this.dataset.colorState || 0);
@@ -1677,7 +1677,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.querySelector('.cell-content').textContent = 'X';
                 } else {
                     this.classList.add('required-yellow');
-                    this.querySelector('.cell-content').textContent = 'ContrÙle Xylophage';
+                    this.querySelector('.cell-content').textContent = 'Contr√¥le Xylophage';
                 }
                 this.dataset.colorState = state.toString();
                 updateResults();
@@ -1690,9 +1690,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Ecouteur pour le bouton Refresh
     document.getElementById('refresh-button')?.addEventListener('click', function() {
-         // Empecher l'interaction si la t‚che est en pause
+         // Empecher l'interaction si la t√¢che est en pause
         if (isTaskPaused) {
-            showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+            showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
             return;
         }
         manualRefresh();
@@ -1720,17 +1720,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     const itemId = item.id;
                     if (itemId === 'dropdown-pause-btn-a1') {
                         // --- MODIFICATION ICI ---
-                        // Appeler handlePauseTask, qui gËre maintenant la vÈrification et le verrouillage
+                        // Appeler handlePauseTask, qui g√®re maintenant la v√©rification et le verrouillage
                         handlePauseTask();
-                        // Fermer le menu et rÈinitialiser activeMenu
+                        // Fermer le menu et r√©initialiser activeMenu
                         this.classList.remove('show');
                         activeMenu = null;
                         return;
                         // --- FIN DE LA MODIFICATION ---
                     } else if (itemId === 'dropdown-fin-btn-a1') {
-                         // Empecher l'interaction si la t‚che est en pause
+                         // Empecher l'interaction si la t√¢che est en pause
                         if (isTaskPaused) {
-                            showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+                            showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
                             this.classList.remove('show');
                             activeMenu = null;
                             return;
@@ -1740,9 +1740,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         activeMenu = null;
                         return;
                     } else {
-                        // Empecher l'interaction si la t‚che est en pause
+                        // Empecher l'interaction si la t√¢che est en pause
                         if (isTaskPaused) {
-                            showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+                            showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
                             this.classList.remove('show');
                             activeMenu = null;
                             return;
@@ -1763,9 +1763,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         showA1Buttons();
                     }
                 } else if (cell.id === 'd1') {
-                    // Empecher l'interaction si la t‚che est en pause
+                    // Empecher l'interaction si la t√¢che est en pause
                     if (isTaskPaused) {
-                        showNotification("La t‚che est en pause. Cliquez sur REPRENDRE pour continuer.");
+                        showNotification("La t√¢che est en pause. Cliquez sur REPRENDRE pour continuer.");
                         this.classList.remove('show');
                         activeMenu = null;
                         return;
