@@ -12,8 +12,9 @@
     <div class="container">
         <h1>Gestion des Tâches</h1>
 
+        <!-- GRILLE 4×4 existante -->
         <div class="grid">
-            <div class="cell required-yellow" id="a1" data-initial-text="Local">
+            <div class="cell" id="a1" data-initial-text="Local">
                 <span class="cell-content placeholder">Local</span>
                 <div class="dropdown-menu"></div>
                 <div class="action-buttons">
@@ -21,7 +22,7 @@
             </div>
             <div class="cell empty-cell" id="b1"></div>
             <div class="cell empty-cell" id="c1"></div>
-            <div class="cell required-yellow" id="d1" data-initial-text="Utilisateur">
+            <div class="cell" id="d1" data-initial-text="Utilisateur">
                 <span class="cell-content placeholder">Utilisateur</span>
                 <div class="dropdown-menu"></div>
             </div>
@@ -30,7 +31,7 @@
                 <span class="cell-content placeholder">Début</span>
             </div>
             <div class="cell empty-cell" id="b2"></div>
-            <div class="cell required-yellow" id="c2" data-initial-text="">
+            <div class="cell" id="c2" data-initial-text="">
                 <span class="cell-content placeholder">Contrôle Rat</span>
             </div>
             <div class="cell empty-cell" id="d2"></div>
@@ -39,7 +40,7 @@
                 <span class="cell-content placeholder">Fin</span>
             </div>
             <div class="cell empty-cell" id="b3"></div>
-            <div class="cell required-yellow" id="c3" data-initial-text="Contrôle Xylophage">
+            <div class="cell" id="c3" data-initial-text="Contrôle Xylophage" data-click-count="0">
                 <span class="cell-content placeholder">Contrôle Xylophage</span>
             </div>
             <div class="cell empty-cell" id="d3"></div>
@@ -64,6 +65,7 @@
 
         <button id="refresh-button">🔄 Actualiser toutes les cases</button>
 
+        <!-- 〓〓〓  TABLEAU DES RESULTATS  〓〓〓 -->
         <div id="task-results-table-container"></div>
     </div>
 
