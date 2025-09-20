@@ -547,7 +547,7 @@ h1 {
 #task-results-table tbody tr:nth-child(even) {
     background-color: #f9f9f9; /* Ligne de fond alternée pour une meilleure lisibilité */
 }
-/* --- NOUVEAU : Styles pour les cellules verrouillees --- */
+/* --- Styles pour les cellules verrouillees --- */
 .cell-locked {
     position: relative;
     pointer-events: none; /* Empêche les interactions */
@@ -565,11 +565,4 @@ h1 {
     background-color: rgba(255, 255, 255, 0.7); /* Fond semi-transparent */
     border-radius: 3px;
     padding: 1px;
-}
-
-/* Optionnel : Style pour le texte de notification */
-#notification-banner {
-    /* ... styles existants ... */
-    /* Ajouter si necessaire pour qu'il apparaisse au-dessus des cadenas */
-    z-index: 1000;
 }
