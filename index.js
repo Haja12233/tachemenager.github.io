@@ -755,8 +755,8 @@ function handleFinTask() {
         const taskData = {
             locale: selectedLocale,
             user: document.getElementById('d1')?.querySelector('.cell-content')?.textContent,
-            startTimeFormatted: realStartTimeFormatted, // Heure reelle de debut
-            endTimeFormatted: realFinTimeFormatted,     // Heure reelle de fin
+            startTimeFormatted: realStartTimeFormatted,
+            endTimeFormatted: realFinTimeFormatted,  // Heure réelle de fin
             a4: document.getElementById('a4')?.querySelector('.cell-content')?.textContent,
             b4: document.getElementById('b4')?.querySelector('.cell-content')?.textContent,
             c2: document.getElementById('c2')?.querySelector('.cell-content')?.textContent,
